@@ -1,0 +1,13 @@
+{
+  "name": "mosaic-app",
+  "version": "1.0.0",
+  "description": "A simple Express.js application for creating image mosaics.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sharp": "^0.32.3"
+  }
+}
