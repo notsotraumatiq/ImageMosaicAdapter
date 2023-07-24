@@ -2,6 +2,8 @@ const express = require('express');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+// This is just a sample to document the parameter for getImageDimensions()
+const imageFilePath = 'path/to/your/image.jpg';
 
 const app = express();
 
@@ -60,6 +62,29 @@ async function splitImageIntoGrid(sourceImage, numRows, numCols) {
 
   console.log(`Split ${sourceImage} into ${numRows} rows and ${numCols} columns.`);
 }
+
+async function getImageDimensions(imageFilePath) {
+	try {
+	  const metadata = await sharp(imageFilePath).metadata();
+	  return { width: metadata.width, height: metadata.height };
+	} catch (error) {
+	  console.error('Error while getting image dimensions:', error);
+	  return null;
+	}
+  }
+
+// Get the dimensions of an image.  This is just a sample to document the parameter for getImageDimensions().
+getImageDimensions(imageFilePath)
+  .then(({ width, height }) => {
+    console.log(`Image dimensions: ${width}x${height}`);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+
+
+
+
 
 // Endpoint to split the large image into a grid
 app.get('/split-image', async (req, res) => {
