@@ -2,28 +2,88 @@ const express = require('express');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-// This is just a sample to document the parameter for getImageDimensions()
-const imageFilePath = 'path/to/your/image.jpg';
 
 const app = express();
+app.use(express.json());
 
-// Create a mosaic from a grid of images
-async function createMosaic(images, mosaicWidth, mosaicHeight) {
+
+// Split a large image into a grid of smaller images
+  async function splitImageIntoGrid(sourceImage, numRows, numCols) {
+    try {
+      const image = sharp(sourceImage);
+      const metadata = await image.metadata();
+      const { width, height } = metadata;
+  
+      const cellWidth = Math.floor(width / numCols);
+      const cellHeight = Math.floor(height / numRows);
+    
+      console.log(`Source image dimensions: ${width}x${height}`);
+      console.log(`Cell dimensions: ${cellWidth}x${cellHeight}`);
+
+
+      // Create the output directory if it doesn't exist
+      const outputDir = 'images/out';
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir);
+      }
+  
+      // Split the image into smaller images
+      for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+          const x = col * cellWidth;
+          const y = row * cellHeight;
+  
+          const outputPath = path.join(outputDir, `image_${row}_${col}.png`);
+          console.log(`Output path: ${outputPath}`);
+          console.log(`Extracting cell at (${x}, ${y}) with width ${cellWidth} and height ${cellHeight}`);
+
+          await image
+            .extract({ left: x, top: y, width: cellWidth, height: cellHeight })
+            .toFile(outputPath);
+        }
+      }
+  
+      console.log(`Split ${sourceImage} into ${numRows} rows and ${numCols} columns.`);
+    } catch (error) {
+      console.error('Error while splitting the image:', error);
+    }
+  }
+
+
+async function createMosaic(gridData) {
+  const mosaicHeight = gridData.length;
+  const mosaicWidth = gridData[0].length;
+
+  // Find the largest image dimensions in the grid
+  let maxWidth = 0;
+  let maxHeight = 0;
+  for (let row = 0; row < mosaicHeight; row++) {
+    for (let col = 0; col < mosaicWidth; col++) {
+      const imageFile = gridData[row][col];
+      const { width, height } = await getImageDimensions(imageFile);
+      maxWidth = Math.max(maxWidth, width);
+      maxHeight = Math.max(maxHeight, height);
+    }
+  }
+
   // Create a blank canvas to draw the mosaic on
   const canvas = sharp({
     create: {
-      width: mosaicWidth * imageWidth,
-      height: mosaicHeight * imageHeight,
+      width: mosaicWidth * maxWidth,
+      height: mosaicHeight * maxHeight,
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 }
     }
   });
 
-  // Draw each image onto the canvas at the correct position
-  for (let y = 0; y < mosaicHeight; y++) {
-    for (let x = 0; x < mosaicWidth; x++) {
-      const image = images[y * mosaicWidth + x];
-      canvas.composite([{ input: image, top: y * imageHeight, left: x * imageWidth }]);
+  // Draw each image onto the canvas at the correct position with padding
+  for (let row = 0; row < mosaicHeight; row++) {
+    for (let col = 0; col < mosaicWidth; col++) {
+      const imageFile = gridData[row][col];
+      const { width, height } = await getImageDimensions(imageFile);
+      const xOffset = col * maxWidth + (maxWidth - width) / 2;
+      const yOffset = row * maxHeight + (maxHeight - height) / 2;
+      canvas.composite([{ input: imageFile, top: yOffset, left: xOffset }]);
     }
   }
 
@@ -31,94 +91,45 @@ async function createMosaic(images, mosaicWidth, mosaicHeight) {
   await canvas.toFile('mosaic.png');
 }
 
-// Split a large image into a grid of smaller images
-async function splitImageIntoGrid(sourceImage, numRows, numCols) {
-  const image = sharp(sourceImage);
-  const metadata = await image.metadata();
-  const { width, height } = metadata;
-
-  const cellWidth = Math.floor(width / numCols);
-  const cellHeight = Math.floor(height / numRows);
-
-  // Create the output directory if it doesn't exist
-  const outputDir = 'output_images';
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir);
+async function getImageDimensions(imageFilePath) {
+  try {
+    const metadata = await sharp(imageFilePath).metadata();
+    return { width: metadata.width, height: metadata.height };
+  } catch (error) {
+    console.error('Error while getting image dimensions:', error);
+    return { width: 0, height: 0 };
   }
-
-  // Split the image into smaller images
-  for (let row = 0; row < numRows; row++) {
-    for (let col = 0; col < numCols; col++) {
-      const x = col * cellWidth;
-      const y = row * cellHeight;
-
-      const outputPath = path.join(outputDir, `image_${row}_${col}.png`);
-
-      await image
-        .extract({ left: x, top: y, width: cellWidth, height: cellHeight })
-        .toFile(outputPath);
-    }
-  }
-
-  console.log(`Split ${sourceImage} into ${numRows} rows and ${numCols} columns.`);
 }
 
-async function getImageDimensions(imageFilePath) {
-	try {
-	  const metadata = await sharp(imageFilePath).metadata();
-	  return { width: metadata.width, height: metadata.height };
-	} catch (error) {
-	  console.error('Error while getting image dimensions:', error);
-	  return null;
-	}
+// Endpoint to create a mosaic from the grid of images
+app.post('/create-mosaic', async (req, res) => {
+  const gridData = req.body;
+
+  if (!Array.isArray(gridData) || gridData.some(row => !Array.isArray(row))) {
+    res.status(400).send('Invalid grid data format. Please provide a structured representation of the grid.');
+    return;
   }
 
-// Get the dimensions of an image.  This is just a sample to document the parameter for getImageDimensions().
-getImageDimensions(imageFilePath)
-  .then(({ width, height }) => {
-    console.log(`Image dimensions: ${width}x${height}`);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-
-
-
-
+  try {
+    await createMosaic(gridData);
+    res.send('Mosaic created.');
+  } catch (error) {
+    console.error('Error creating mosaic:', error);
+    res.status(500).send('Error creating mosaic.');
+  }
+});
 
 // Endpoint to split the large image into a grid
 app.get('/split-image', async (req, res) => {
-  const sourceImage = 'path/to/source/image.jpg';
-  const numRows = 3;
-  const numCols = 4;
+    const sourceImage = 'images/in/charger66.jpg';
+    const numRows = 3;
+    const numCols = 4;
+  
+    await splitImageIntoGrid(sourceImage, numRows, numCols);
+  
+    res.send('Image split into grid.');
+  });
 
-  await splitImageIntoGrid(sourceImage, numRows, numCols);
-
-  res.send('Image split into grid.');
-});
-
-// Endpoint to create a mosaic from the grid of images
-app.get('/create-mosaic', async (req, res) => {
-  const mosaicWidth = 4;
-  const mosaicHeight = 3;
-  const images = [];
-
-  // Assuming the grid of images is stored in the 'output_images' directory
-  const gridDir = 'output_images';
-
-  // Read the images from the grid directory
-  for (let row = 0; row < mosaicHeight; row++) {
-    for (let col = 0; col < mosaicWidth; col++) {
-      const imageFile = path.join(gridDir, `image_${row}_${col}.png`);
-      const imageBuffer = fs.readFileSync(imageFile);
-      images.push(imageBuffer);
-    }
-  }
-
-  await createMosaic(images, mosaicWidth, mosaicHeight);
-
-  res.send('Mosaic created.');
-});
 
 // Start the server
 app.listen(3000, () => {
