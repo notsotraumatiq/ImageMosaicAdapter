@@ -1,6 +1,6 @@
 const express = require('express');
 const sharp = require('sharp');
-const fs = require('fs');
+const fs = require('fs/promises');
 const path = require('path');
 
 const app = express();
@@ -16,31 +16,57 @@ app.use(express.json());
   
       const cellWidth = Math.floor(width / numCols);
       const cellHeight = Math.floor(height / numRows);
+
+      console.log(`Cell Width: ${cellWidth}, Cell Height: ${cellHeight}`);
     
-      console.log(`Source image dimensions: ${width}x${height}`);
-      console.log(`Cell dimensions: ${cellWidth}x${cellHeight}`);
+      // console.log(`Source image dimensions: ${width}x${height}`);
+      // console.log(`Cell dimensions: ${cellWidth}x${cellHeight}`);
 
 
       // Create the output directory if it doesn't exist
       const outputDir = 'images/out';
+      /*
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
       }
+      */
   
       // Split the image into smaller images
       for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
-          const x = col * cellWidth;
-          const y = row * cellHeight;
+          const x = Math.floor(col * cellWidth);
+          const y = Math.floor(row * cellHeight);
   
-          const outputPath = path.join(outputDir, `image_${row}_${col}.png`);
+          console.log(`Row: ${row}, Col: ${col}, x: ${x}, y: ${y}, cellWidth: ${cellWidth}, cellHeight: ${cellHeight}`);
+
+          const outputPath = path.join(outputDir, `image_${row}_${col}.jpg`);
           console.log(`Output path: ${outputPath}`);
           console.log(`Extracting cell at (${x}, ${y}) with width ${cellWidth} and height ${cellHeight}`);
 
-          await image
+          /*
+          try {
+            const extractedImage = image.extract({ left: x, top: y, width: cellWidth, height: cellHeight });
+            const buffer = await extractedImage.toBuffer();
+            // await fs.writeFile(outputPath, buffer);
+            console.log(`Saved image_${row}_${col}.png`);
+          } catch (error) {
+            console.error('Error while extracting and saving image:', error);
+          }
+          */
+
+
+          await sharp(sourceImage)
             .extract({ left: x, top: y, width: cellWidth, height: cellHeight })
             .toFile(outputPath);
+          
+
+        /*
+          await image
+          .extract({ left: x, top: y, width: cellWidth, height: cellHeight })
+          .jpeg.toString('base64');
+        */
         }
+        
       }
   
       console.log(`Split ${sourceImage} into ${numRows} rows and ${numCols} columns.`);
@@ -121,9 +147,9 @@ app.post('/create-mosaic', async (req, res) => {
 
 // Endpoint to split the large image into a grid
 app.get('/split-image', async (req, res) => {
-    const sourceImage = 'images/in/charger66.jpg';
-    const numRows = 3;
-    const numCols = 4;
+    const sourceImage = 'images/in/charger66_rgb.jpg';
+    const numRows = 2;
+    const numCols = 2;
   
     await splitImageIntoGrid(sourceImage, numRows, numCols);
   
