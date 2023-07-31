@@ -24,7 +24,7 @@ app.use(express.json());
 
 
       // Create the output directory if it doesn't exist
-      const outputDir = 'images/out';
+      const outputDir = 'images/cells/charger66';
       /*
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
@@ -79,24 +79,29 @@ app.use(express.json());
 async function createMosaic(gridData) {
   const mosaicHeight = gridData.length;
   const mosaicWidth = gridData[0].length;
+  const baseDir = 'images/cells/charger66';
+
+  console.log(`Mosaic Height: ${mosaicHeight}, Mosaic Width: ${mosaicWidth}, Base Dir: ${baseDir}, Grid Data: ${gridData}`);
 
   // Find the largest image dimensions in the grid
   let maxWidth = 0;
   let maxHeight = 0;
   for (let row = 0; row < mosaicHeight; row++) {
     for (let col = 0; col < mosaicWidth; col++) {
-      const imageFile = gridData[row][col];
+      const imageFile = `${baseDir}/${gridData[row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
       maxWidth = Math.max(maxWidth, width);
       maxHeight = Math.max(maxHeight, height);
     }
   }
 
+  const compositeOperations = [];
+
   // Create a blank canvas to draw the mosaic on
-  const canvas = sharp({
+  let canvas = sharp({
     create: {
-      width: mosaicWidth * maxWidth,
-      height: mosaicHeight * maxHeight,
+      width: Math.ceil(mosaicWidth * maxWidth),
+      height: Math.ceil(mosaicHeight * maxHeight),
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 }
     }
@@ -105,16 +110,21 @@ async function createMosaic(gridData) {
   // Draw each image onto the canvas at the correct position with padding
   for (let row = 0; row < mosaicHeight; row++) {
     for (let col = 0; col < mosaicWidth; col++) {
-      const imageFile = gridData[row][col];
+      const imageFile = `${baseDir}/${gridData[row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
-      const xOffset = col * maxWidth + (maxWidth - width) / 2;
-      const yOffset = row * maxHeight + (maxHeight - height) / 2;
-      canvas.composite([{ input: imageFile, top: yOffset, left: xOffset }]);
+      const xOffset = col * maxWidth + Math.ceil((maxWidth - width) / 2);
+      const yOffset = row * maxHeight + Math.ceil((maxHeight - height) / 2);
+
+      console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
+      compositeOperations.push({ input: imageFile, top: yOffset, left: xOffset });
     }
   }
 
+  // composite all images once
+  canvas = await canvas.composite(compositeOperations);
+
   // Write the mosaic to a file
-  await canvas.toFile('mosaic.png');
+  await canvas.toFile('images/mosaics/charger66mosaic.png');
 }
 
 async function getImageDimensions(imageFilePath) {
@@ -128,8 +138,20 @@ async function getImageDimensions(imageFilePath) {
 }
 
 // Endpoint to create a mosaic from the grid of images
-app.post('/create-mosaic', async (req, res) => {
-  const gridData = req.body;
+app.get('/create-mosaic', async (req, res) => {
+  // const gridData = req.body;
+ 
+  const mosaicHeight = 5;
+  const mosaicWidth = 8;
+  const gridData = Array.from({length: mosaicHeight}, () => Array(mosaicWidth).fill(''));
+  for (let row = 0; row < mosaicHeight; row++) {
+    for (let col = 0; col < mosaicWidth; col++) {
+      gridData[row][col] = `image_${row}_${col}.jpg`;
+	  // console.log("filename: " + gridData[row][col]);
+	}
+  }
+
+  console.log(`Grid Data: ${JSON.stringify(gridData)}`);
 
   if (!Array.isArray(gridData) || gridData.some(row => !Array.isArray(row))) {
     res.status(400).send('Invalid grid data format. Please provide a structured representation of the grid.');
@@ -147,9 +169,9 @@ app.post('/create-mosaic', async (req, res) => {
 
 // Endpoint to split the large image into a grid
 app.get('/split-image', async (req, res) => {
-    const sourceImage = 'images/in/charger66_rgb.jpg';
-    const numRows = 2;
-    const numCols = 2;
+    const sourceImage = 'images/whole/charger66.jpg';
+    const numRows = 5;
+    const numCols = 8;
   
     await splitImageIntoGrid(sourceImage, numRows, numCols);
   
