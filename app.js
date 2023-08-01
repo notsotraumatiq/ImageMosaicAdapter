@@ -179,6 +179,20 @@ app.get('/split-image', async (req, res) => {
   });
 
 
+// Endpoint to convert a png image to dicom via graphicsmagick
+app.get('/convert-png-to-dicom', async (req, res) => {
+	  const sourceImage = 'images/whole/charger66.jpg';
+	  const dicomFile  = 'images/whole/charger66.dcm';
+
+	  const gm = require('gm').subClass({imageMagick: true});
+	  gm(sourceImage)
+  		.setFormat('dicom')
+  		.write(dicomFile, function (err) {
+    		if (!err) console.log('done');
+		});
+	});
+
+
 // Start the server
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
