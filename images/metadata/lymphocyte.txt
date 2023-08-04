@@ -1,0 +1,11 @@
+fld-q196-124584-1060,911-27,27-lymphocyte_small.png
+fld-q196-193772-1324,605-30,36-lymphocyte_small.png
+fld-q196-217692-1979,696-25,25-lymphocyte_small.png
+fld-q196-220888-496,898-30,28-lymphocyte_small.png
+fld-q196-220888-962,939-25,27-lymphocyte_small.png
+fld-q196-240292-1282,1073-24,23-lymphocyte_small.png
+fld-q310-53198-1207,491-30,28-lymphocyte_small.png
+fld-q310-53215-599,484-34,35-lymphocyte_small.png
+fld-q310-53216-1430,1787-28,31-lymphocyte_small.png
+fld-q310-59653-2142,468-24,27-lymphocyte_small.png
+fld-q310-68831-1217,1443-25,25-lymphocyte_small.png

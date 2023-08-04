@@ -1,0 +1,15 @@
+fld-q196-107324-632,42-108,84-epithel_undecided.png
+fld-q196-115146-2332,1705-137,176-denucleated_epithel_squamous.png
+fld-q196-222082-1421,742-294,303-denucleated_epithel_squamous.png
+fld-q196-222105-1712,1155-464,334-denucleated_epithel_squamous.png
+fld-q196-247514-585,114-197,228-denucleated_epithel_squamous.png
+fld-q196-247567-1551,1239-91,183-nucleated_epithel_squamous.png
+fld-q310-142342-2125,755-124,90-glandular_epithel.png
+fld-q310-45074-2548,832-88,72-denucleated_epithel_squamous.png
+fld-q310-45074-540,535-134,122-denucleated_epithel_squamous.png
+fld-q310-45075-1485,632-132,118-denucleated_epithel_squamous.png
+fld-q310-45075-2053,1318-154,97-denucleated_epithel_squamous.png
+fld-q310-47346-1767,508-46,35-epithel_undecided.png
+fld-q310-55011-1279,426-60,55-nucleated_epithel_squamous.png
+fld-q87-56480-1682,334-46,45-epithel_undecided.png
+fld-q87-56482-714,76-66,93-epithel_secretory.png

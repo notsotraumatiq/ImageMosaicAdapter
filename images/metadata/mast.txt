@@ -1,0 +1,12 @@
+fld-q196-145867-1434,449-42,53-mast_cell.png
+fld-q196-194606-1921,1439-44,46-mast_cell.png
+fld-q196-197650-1024,283-138,204-mast_cell.png
+fld-q310-212447-793,820-50,50-mast_cell.png
+fld-q310-212469-137,712-51,52-mast_cell.png
+fld-q310-250901-282,730-55,56-mast_cell.png
+fld-q310-354695-1044,889-62,57-mast_cell.png
+fld-q310-354705-1593,484-61,68-mast_cell.png
+fld-q310-86350-1132,807-61,57-mast_cell.png
+fld-q548-130952-1890,63-52,55-mast_cell.png
+fld-q548-130997-1118,363-62,64-mast_cell.png
+fld-q548-131433-1561,500-45,43-mast_cell.png
