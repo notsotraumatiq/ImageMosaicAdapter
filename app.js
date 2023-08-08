@@ -77,19 +77,20 @@ app.use(express.json());
 
 
 async function createMosaic(gridData) {
-  const mosaicHeight = gridData.length;
-  const mosaicWidth = gridData[0].length;
+  const mosaicHeight = gridData[0].length;
+  const mosaicWidth = gridData[0][0].length;
   // const baseDir = 'images/cells/charger66';
-  const baseDir = 'images/cells/fna_viola_patch/viola_patch';
+  const baseDir = 'images/cells/fna_violo_patch/violo_patch';
 
-  console.log(`Mosaic Height: ${mosaicHeight}, Mosaic Width: ${mosaicWidth}, Base Dir: ${baseDir}, Grid Data: ${gridData}`);
+  console.log(`Mosaic Height: ${mosaicHeight}, Mosaic Width: ${mosaicWidth}, Base Dir: ${baseDir}, Grid Data in CREATE-MOSAIC: ${JSON.stringify(gridData)}`);
 
   // Find the largest image dimensions in the grid
+  let grid = 0;
   let maxWidth = 0;
   let maxHeight = 0;
   for (let row = 0; row < mosaicHeight; row++) {
     for (let col = 0; col < mosaicWidth; col++) {
-      const imageFile = `${baseDir}/${gridData[row][col]}`;
+      const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
       maxWidth = Math.max(maxWidth, width);
       maxHeight = Math.max(maxHeight, height);
@@ -111,7 +112,7 @@ async function createMosaic(gridData) {
   // Draw each image onto the canvas at the correct position with padding
   for (let row = 0; row < mosaicHeight; row++) {
     for (let col = 0; col < mosaicWidth; col++) {
-      const imageFile = `${baseDir}/${gridData[row][col]}`;
+      const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
       const xOffset = col * maxWidth + Math.ceil((maxWidth - width) / 2);
       const yOffset = row * maxHeight + Math.ceil((maxHeight - height) / 2);
@@ -125,7 +126,7 @@ async function createMosaic(gridData) {
   canvas = await canvas.composite(compositeOperations);
 
   // Write the mosaic to a file
-  await canvas.toFile('images/mosaics/charger66mosaic.png');
+  await canvas.toFile(`images/mosaics/grid${grid}.png`);
 }
 
 async function getImageDimensions(imageFilePath) {
@@ -193,21 +194,23 @@ function getGridData() {
 app.get('/create-mosaic', async (req, res) => {
   // const gridData = req.body;
  
+
+/*
   const mosaicHeight = 5;
   const mosaicWidth = 5;
 
-  /*
   const gridData = Array.from({length: mosaicHeight}, () => Array(mosaicWidth).fill(''));
   for (let row = 0; row < mosaicHeight; row++) {
     for (let col = 0; col < mosaicWidth; col++) {
       gridData[row][col] = `image_${row}_${col}.jpg`;
-	  // console.log("filename: " + gridData[row][col]);
-	}
+	    // console.log("filename: " + gridData[row][col]);
+	  }
   }
 */
   const gridData = getGridData();
 
   console.log(`Grid Data: ${JSON.stringify(gridData)}`);
+  console.log(`Grid Data AFTER STRINGIFY: ${JSON.stringify(gridData)}`);
 
   if (!Array.isArray(gridData) || gridData.some(row => !Array.isArray(row))) {
     res.status(400).send('Invalid grid data format. Please provide a structured representation of the grid.');
@@ -253,3 +256,52 @@ app.get('/convert-png-to-dicom', async (req, res) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
+
+/*
+[
+  [
+    [
+      "fld-q196-115217-466,937-28,24-nRBC.png",
+      "fld-q310-42129-1571,364-28,28-nRBC.png",
+      "fld-q310-42132-1269,881-27,24-nRBC.png",
+      "fld-q310-42132-2196,1009-26,27-nRBC.png",
+      "fld-q310-42132-2243,540-29,28-nRBC.png",
+    ],
+    [
+      "fld-q310-47346-1184,1809-23,24-nRBC.png",
+      "fld-q310-47346-1436,1036-26,27-nRBC.png",
+      "fld-q310-47346-1585,379-21,21-nRBC.png",
+      "fld-q310-47346-1871,1289-25,25-nRBC.png",
+      "fld-q310-47346-2116,618-19,23-nRBC.png",
+    ],
+    [
+      "fld-q310-47346-2404,974-25,27-nRBC.png",
+      "fld-q310-47346-396,1041-24,23-nRBC.png",
+      "fld-q310-47346-776,719-27,26-nRBC.png",
+      "fld-q310-47347-1201,103-24,23-nRBC.png",
+      "fld-q310-47347-1490,1761-23,24-nRBC.png",
+    ],
+    [
+      "fld-q310-47347-1593,462-26,22-nRBC.png",
+      "fld-q310-47347-1822,1108-23,28-nRBC.png",
+      "fld-q310-47347-23,1264-23,20-nRBC.png",
+      "fld-q310-47347-2378,1216-24,23-nRBC.png",
+      "fld-q310-47347-562,1604-25,27-nRBC.png",
+    ],
+    [
+      "fld-q310-47347-724,1206-23,25-nRBC.png",
+      "fld-q310-55407-122,359-27,25-nRBC.png",
+      "fld-q310-55407-1307,1656-29,29-nRBC.png",
+      "fld-q310-55407-1644,1895-23,26-nRBC.png",
+      "fld-q310-55407-2565,1546-26,28-nRBC.png",
+    ],
+  ],
+  [
+    [
+      "fld-q310-55409-1099,287-29,22-nRBC.png",
+      "fld-q310-62157-2086,96-28,30-nRBC.png",
+      "fld-q310-62157-2290,912-27,32-nRBC.png",
+    ],
+  ],
+];
+*/
