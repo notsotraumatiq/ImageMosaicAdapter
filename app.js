@@ -79,7 +79,7 @@ app.use(express.json());
 async function createMosaic(gridData, padding=0) {
   const mosaicRows = gridData[0].length;
   const mosaicCols = gridData[0][0].length;
-  const gridLineWidth = 2; // width of the grid lines in pixels
+  const gridLineWidth = 1; // width of the grid lines in pixels
   // const baseDir = 'images/cells/charger66';
   const baseDir = 'images/cells/fna_violo_patch/violo_patch';
 
@@ -100,8 +100,10 @@ async function createMosaic(gridData, padding=0) {
   // adjust maxCellWidth and maxCellHeight to include padding
   maxCellWidth = Math.ceil(maxCellWidth * (1 + padding/100));
   maxCellHeight = Math.ceil(maxCellHeight * (1 + padding/100));
-  const canvasWidth = Math.ceil(mosaicCols * maxCellWidth + (mosaicCols + 1) * gridLineWidth);
-  const canvasHeight = Math.ceil(mosaicRows * maxCellHeight + (mosaicRows + 1) * gridLineWidth);
+  const canvasWidth =  Math.ceil((mosaicCols *  maxCellWidth) + (gridLineWidth * (mosaicCols + 1)));
+  const canvasHeight = Math.ceil((mosaicRows * maxCellHeight) + (gridLineWidth * (mosaicRows + 1)));
+  console.log(`Max Cell Width: ${maxCellWidth}, Max Cell Height: ${maxCellHeight}, Canvas Width: ${canvasWidth}, Canvas Height: ${canvasHeight}`);
+
 
   const compositeOperations = [];
 
@@ -111,7 +113,7 @@ async function createMosaic(gridData, padding=0) {
       width: canvasWidth,
       height: canvasHeight,
       channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 } // white background
+      background: { r: 0, g: 0, b: 0, alpha: 1 } // white background
     }
   });
 
@@ -120,11 +122,29 @@ async function createMosaic(gridData, padding=0) {
     for (let col = 0; col < mosaicCols; col++) {
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
-      const xOffset = col * maxCellWidth + Math.ceil((maxCellWidth - width) / 2);
-      const yOffset = row * maxCellHeight + Math.ceil((maxCellHeight - height) / 2);
+      // const xOffset = col * maxCellWidth + Math.ceil((maxCellWidth - width) / 2);
+      // const yOffset = row * maxCellHeight + Math.ceil((maxCellHeight - height) / 2);
+
+      // Create a white background for each image
+      const imageWithBackground = await sharp(imageFile)
+        .extend({
+          top: Math.ceil((maxCellHeight - height) / 2),
+          bottom: Math.ceil((maxCellHeight - height) / 2),
+          left: Math.ceil((maxCellWidth - width) / 2),
+          right: Math.ceil((maxCellWidth - width) / 2),
+          background: { r: 255, g: 255, b: 255, alpha: 1 }
+        })
+        .toBuffer();
+
+        const xOffset = col * (maxCellWidth + gridLineWidth) + gridLineWidth;
+        const yOffset = row * (maxCellHeight + gridLineWidth) + gridLineWidth;
+  
+        console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
+  
+        compositeOperations.push({ input: imageWithBackground, top: yOffset, left: xOffset });
 
       console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
-      compositeOperations.push({ input: imageFile, top: yOffset, left: xOffset });
+      // compositeOperations.push({ input: imageFile, top: yOffset, left: xOffset });
     }
   }
 
