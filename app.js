@@ -76,46 +76,52 @@ app.use(express.json());
   }
 
 
-async function createMosaic(gridData) {
-  const mosaicHeight = gridData[0].length;
-  const mosaicWidth = gridData[0][0].length;
+async function createMosaic(gridData, padding=0) {
+  const mosaicRows = gridData[0].length;
+  const mosaicCols = gridData[0][0].length;
+  const gridLineWidth = 2; // width of the grid lines in pixels
   // const baseDir = 'images/cells/charger66';
   const baseDir = 'images/cells/fna_violo_patch/violo_patch';
 
-  console.log(`Mosaic Height: ${mosaicHeight}, Mosaic Width: ${mosaicWidth}, Base Dir: ${baseDir}, Grid Data in CREATE-MOSAIC: ${JSON.stringify(gridData)}`);
+  console.log(`Mosaic Rows: ${mosaicRows}, Mosaic Cols: ${mosaicCols}, Base Dir: ${baseDir}, Grid Data in CREATE-MOSAIC: ${JSON.stringify(gridData)}`);
 
   // Find the largest image dimensions in the grid
   let grid = 0;
-  let maxWidth = 0;
-  let maxHeight = 0;
-  for (let row = 0; row < mosaicHeight; row++) {
-    for (let col = 0; col < mosaicWidth; col++) {
+  let maxCellWidth = 0;
+  let maxCellHeight = 0;
+  for (let row = 0; row < mosaicRows; row++) {
+    for (let col = 0; col < mosaicCols; col++) {
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
-      maxWidth = Math.max(maxWidth, width);
-      maxHeight = Math.max(maxHeight, height);
+      maxCellWidth = Math.max(maxCellWidth, width);
+      maxCellHeight = Math.max(maxCellHeight, height);
     }
   }
+  // adjust maxCellWidth and maxCellHeight to include padding
+  maxCellWidth = Math.ceil(maxCellWidth * (1 + padding/100));
+  maxCellHeight = Math.ceil(maxCellHeight * (1 + padding/100));
+  const canvasWidth = Math.ceil(mosaicCols * maxCellWidth + (mosaicCols + 1) * gridLineWidth);
+  const canvasHeight = Math.ceil(mosaicRows * maxCellHeight + (mosaicRows + 1) * gridLineWidth);
 
   const compositeOperations = [];
 
   // Create a blank canvas to draw the mosaic on
   let canvas = sharp({
     create: {
-      width: Math.ceil(mosaicWidth * maxWidth),
-      height: Math.ceil(mosaicHeight * maxHeight),
+      width: canvasWidth,
+      height: canvasHeight,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
+      background: { r: 255, g: 255, b: 255, alpha: 1 } // white background
     }
   });
 
   // Draw each image onto the canvas at the correct position with padding
-  for (let row = 0; row < mosaicHeight; row++) {
-    for (let col = 0; col < mosaicWidth; col++) {
+  for (let row = 0; row < mosaicRows; row++) {
+    for (let col = 0; col < mosaicCols; col++) {
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       const { width, height } = await getImageDimensions(imageFile);
-      const xOffset = col * maxWidth + Math.ceil((maxWidth - width) / 2);
-      const yOffset = row * maxHeight + Math.ceil((maxHeight - height) / 2);
+      const xOffset = col * maxCellWidth + Math.ceil((maxCellWidth - width) / 2);
+      const yOffset = row * maxCellHeight + Math.ceil((maxCellHeight - height) / 2);
 
       console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
       compositeOperations.push({ input: imageFile, top: yOffset, left: xOffset });
@@ -193,15 +199,16 @@ function getGridData() {
 // Endpoint to create a mosaic from the grid of images
 app.get('/create-mosaic', async (req, res) => {
   // const gridData = req.body;
+  const padding = req.query.padding || 0; // padding for each grid cell, as a percentage of the cell size
  
 
 /*
-  const mosaicHeight = 5;
-  const mosaicWidth = 5;
+  const mosaicRows = 5;
+  const mosaicCols = 5;
 
-  const gridData = Array.from({length: mosaicHeight}, () => Array(mosaicWidth).fill(''));
-  for (let row = 0; row < mosaicHeight; row++) {
-    for (let col = 0; col < mosaicWidth; col++) {
+  const gridData = Array.from({length: mosaicRows}, () => Array(mosaicCols).fill(''));
+  for (let row = 0; row < mosaicRows; row++) {
+    for (let col = 0; col < mosaicCols; col++) {
       gridData[row][col] = `image_${row}_${col}.jpg`;
 	    // console.log("filename: " + gridData[row][col]);
 	  }
@@ -218,7 +225,7 @@ app.get('/create-mosaic', async (req, res) => {
   }
 
   try {
-    await createMosaic(gridData);
+    await createMosaic(gridData, padding);
     res.send('Mosaic created.');
   } catch (error) {
     console.error('Error creating mosaic:', error);
