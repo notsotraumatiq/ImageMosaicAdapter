@@ -113,7 +113,7 @@ async function createMosaic(gridData, padding=0) {
       width: canvasWidth,
       height: canvasHeight,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 1 } // white background
+      background: { r: 255, g: 255, b: 255, alpha: 1 } // white background
     }
   });
 
@@ -132,7 +132,7 @@ async function createMosaic(gridData, padding=0) {
           bottom: Math.ceil((maxCellHeight - height) / 2),
           left: Math.ceil((maxCellWidth - width) / 2),
           right: Math.ceil((maxCellWidth - width) / 2),
-          background: { r: 255, g: 255, b: 255, alpha: 1 }
+          background: { r: 5, g: 5, b: 5, alpha: 1 }
         })
         .toBuffer();
 
