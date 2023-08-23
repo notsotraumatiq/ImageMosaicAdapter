@@ -1,7 +1,7 @@
 import os
 from PIL import Image
 import pydicom
-from pydicom.dataset import dataset
+from pydicom import Dataset
 from pydicom.uid import generate_uid
 
 # Input and ouput directories
@@ -24,6 +24,10 @@ for png_filename in os.listdir(input_dir):
         ds.SOPInstanceUID = generate_uid()
         ds.Modality = 'OT' # Other
         ds.ImageType = ['DERIVED', 'PRIMARY']
+
+        # Set endianness and VR encoding
+        ds.is_little_endian = True
+        ds.is_implicit_VR = True
 
         # Convert PIL image to bytes and store as Pixel Data
         pixel_array = png_image.tobytes()
