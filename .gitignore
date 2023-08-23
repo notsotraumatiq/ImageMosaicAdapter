@@ -129,5 +129,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# python virtual environment
-mosaicvenv*
+# Exclude python virtual environment
+mosaicvenv/
+
+# Exclude Python built files
+*.pyc
+__pycache__/
