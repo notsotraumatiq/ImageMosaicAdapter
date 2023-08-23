@@ -128,3 +128,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Exclude python virtual environment
+mosaicvenv/
+
+# Exclude Python built files
+*.pyc
+__pycache__/
