@@ -20,7 +20,7 @@ for png_filename in os.listdir(input_dir):
         png_path = os.path.join(input_dir, png_filename)
 
         # Read the PNG image
-        png_data = open(png_path, 'rb').read()
+        png_image = Image.open(png_path)
 
         # Increment Series Number
         series_number += 1
@@ -36,14 +36,15 @@ for png_filename in os.listdir(input_dir):
         ds.SeriesNumber = series_number
         ds.SOPInstanceUID = generate_uid()
         ds.Modality = 'OT' # Other
-        ds.Rows = ds.Columns = 512 # Replace with actual dimensions
+        ds.Rows = png_image.height
+        ds.Columns = png_image.width
 
         # Set endianness and VR encoding
         ds.is_little_endian = True
         ds.is_implicit_VR = True
 
         # Convert PIL image to bytes and store as Pixel Data
-        ds.PixelData = png_data
+        ds.PixelData = png_image.tobytes()
 
         # Save DICOM file
         dicom_filename = os.path.splitext(png_filename)[0] + '.dcm'
