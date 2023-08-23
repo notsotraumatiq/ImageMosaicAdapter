@@ -16,22 +16,20 @@ for png_filename in os.listdir(input_dir):
     if png_filename.endswith('.png'):
         # Load PNG image
         png_path = os.path.join(input_dir, png_filename)
-        png_image = Image.open(png_path)
 
         # Create a DICOM dataset
         # Ideally, more metadata would be fed in here while converting images
         ds = Dataset()
         ds.SOPInstanceUID = generate_uid()
         ds.Modality = 'OT' # Other
-        ds.ImageType = ['DERIVED', 'PRIMARY']
+        ds.Rows = ds.Columns = 512 # Replace with actual dimensions
 
         # Set endianness and VR encoding
         ds.is_little_endian = True
         ds.is_implicit_VR = True
 
         # Convert PIL image to bytes and store as Pixel Data
-        pixel_array = png_image.tobytes()
-        ds.PixelData = pixel_array
+        ds.PixelData = open(png_path, 'rb').read()
 
         # Save DICOM file
         dicom_filename = os.path.splitext(png_filename)[0] + '.dcm'
