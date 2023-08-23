@@ -11,15 +11,29 @@ output_dir = './images/dicom-mosaics'
 # Create output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
 
+series_number = 0
+
 # Loop through PNG images in the input directory
 for png_filename in os.listdir(input_dir):
     if png_filename.endswith('.png'):
-        # Load PNG image
+        # Directory containing the PNG image
         png_path = os.path.join(input_dir, png_filename)
+
+        # Read the PNG image
+        png_data = open(png_path, 'rb').read()
+
+        # Increment Series Number
+        series_number += 1
 
         # Create a DICOM dataset
         # Ideally, more metadata would be fed in here while converting images
         ds = Dataset()
+        ds.PatientName = 'John Doe'
+        ds.PatientID = '12345'
+        ds.StudyInstanceUID = generate_uid()
+        ds.StudyDescription = 'Cells Mosaic'
+        ds.SeriesInstanceUID = generate_uid()
+        ds.SeriesNumber = series_number
         ds.SOPInstanceUID = generate_uid()
         ds.Modality = 'OT' # Other
         ds.Rows = ds.Columns = 512 # Replace with actual dimensions
@@ -29,7 +43,7 @@ for png_filename in os.listdir(input_dir):
         ds.is_implicit_VR = True
 
         # Convert PIL image to bytes and store as Pixel Data
-        ds.PixelData = open(png_path, 'rb').read()
+        ds.PixelData = png_data
 
         # Save DICOM file
         dicom_filename = os.path.splitext(png_filename)[0] + '.dcm'
