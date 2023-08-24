@@ -44,7 +44,7 @@ for png_filename in os.listdir(input_dir):
         ds.is_implicit_VR = True
 
         # Convert PIL image to bytes and store as Pixel Data
-        ds.PixelData = png_image.tobytes()
+        ds.PixelData = b'DICM' + png_image.tobytes()
 
         # Save DICOM file
         dicom_filename = os.path.splitext(png_filename)[0] + '.dcm'
