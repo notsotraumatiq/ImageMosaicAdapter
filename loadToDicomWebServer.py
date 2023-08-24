@@ -1,18 +1,16 @@
 import os
-import requests
 import pydicom
+from dicomweb_client.api import DICOMwebClient
+
+dicom_dir = './images/mosaic-dicoms'
 
 server_url = 'http://localhost:8008/dcm4chee-arc/aets/DCM4CHEE/rs'
-
-dicom_dir = './images/dicom-mosaics'
+client = DICOMwebClient(server_url)
 
 for filename in os.listdir(dicom_dir):
     dicom_filepath = os.path.join(dicom_dir, filename)
-    ds = pydicom.dcmread(dicom_filepath, force=True)
-    
-    # Send POST request to store DICOM instance
-    headers = {'Content-Type': 'application/dicom'}
-    response = requests.post(server_url, data=ds.PixelData, headers=headers)
+    dataset = pydicom.dcmread(dicom_filepath, force=True)
+    response = client.store_instances([dataset])
     
     if response.status_code == 200:
         print(f"Stored {filename} successfully.")
