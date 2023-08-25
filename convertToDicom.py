@@ -1,20 +1,37 @@
 import os
+import sys
 from PIL import Image
 import pydicom
 import numpy as np
 
 # For now, just take a pre-converted dicom,
 # And experiment with changing certain settings until viewable in viewer
+input_dir = './images/dicom-trials/input'
+output_dir = './images/dicom-trials/output'
 
+# Create ouput directory if it doesn't exist
+os.makedirs(output_dir, exist_ok=True)
 
-# # Input directory paths
-# png_dir = './images/mosaics'
+# Loop through input directory images
+for filename in os.listdir(input_dir):
+    # Read the example DICOM image
+    dicom_path = os.path.join(input_dir, filename)
+    try:
+        ds = pydicom.dcmread(dicom_path)
+    except:
+        print(f"Could not read dicom input file")
+        sys.exit(1)
 
-# # Output directory
-# output_dir = './images/mosaic-dicoms'
+    # If there is no Modality attribute, add it
+    if 'Modality' not in ds:
+        ds.Modality = 'SM' # Slide Microscopy - necessary for Slim
+    
+    # Output the file to the output directory
+    output_path = os.path.join(output_dir, filename)
+    ds.save_as(output_path)
 
-# # Create output directory if it doesn't exist
-# os.makedirs(output_dir, exist_ok=True)
+    print(f"Modified version of {filename} stored in {output_dir}")
+
 
 # # Loop through PNG images in the png_dir
 # for png_filename in os.listdir(png_dir):
