@@ -1,8 +1,17 @@
+import sys
 import pydicom
 
-# Load example DICOM file
-# dicom_file_path = './images/example-dicom/example-dicom.dcm'
-dicom_file_path = './images/mosaic-dicoms/grid0-20pct-black-pad.dcm'
-ds = pydicom.dcmread(dicom_file_path)
+# Check for correct usage
+if len(sys.argv) != 2:
+    print(f"Usage: python {sys.argv[0]} path/to/dicom_file.dcm")
+    sys.exit(1)
+
+# Read dicom_file_path from command-line argument
+dicom_file_path = sys.argv[1] 
+
+try:
+    ds = pydicom.dcmread(dicom_file_path)
+except:
+    ds = f"Could not read file at {dicom_file_path}"
 
 print(ds)
