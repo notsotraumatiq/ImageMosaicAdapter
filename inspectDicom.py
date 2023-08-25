@@ -12,6 +12,7 @@ dicom_file_path = sys.argv[1]
 try:
     ds = pydicom.dcmread(dicom_file_path)
 except:
-    ds = f"Could not read file at {dicom_file_path}"
+    print(f"Could not read file at {dicom_file_path}")
+    sys.exit(2)
 
 print(ds)
