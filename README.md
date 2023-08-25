@@ -38,6 +38,7 @@ docker-compose up -d
 
 ### Storing Images on the DICOM Web Server
 **Storing Images from the CLI**
+
 Images can be stored using the *dicomweb_client* **Python** package in the CLI:
 ```
 dicomweb_client --url http://localhost:8008/dcm4chee-arc/aets/DCM4CHEE/rs \
@@ -46,6 +47,7 @@ path/to/dicomfiles/*
 ```
 
 **Storing Images With the Python Script**
+
 The file `loadToDicomWebServer.py` will store all images located in the `images/dicom-images` directory:
 ```
 python loadToDicomWebServer.py
