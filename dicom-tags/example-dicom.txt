@@ -1,0 +1,263 @@
+Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 224
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: VL Whole Slide Microscopy Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.27.0
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Baseline (Process 1)
+(0002, 0012) Implementation Class UID            UI: 1.3.6.1.4.1.5962.99.2
+(0002, 0013) Implementation Version Name         SH: 'PIXELMEDJAVA001'
+(0002, 0016) Source Application Entity Title     AE: 'OURAETITLE'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
+(0008, 0012) Instance Creation Date              DA: '20190212'
+(0008, 0013) Instance Creation Time              TM: '191333.182'
+(0008, 0014) Instance Creator UID                UI: 1.3.6.1.4.1.5962.99.3
+(0008, 0016) SOP Class UID                       UI: VL Whole Slide Microscopy Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.27.0
+(0008, 0020) Study Date                          DA: '20091229'
+(0008, 0021) Series Date                         DA: '20091229'
+(0008, 0022) Acquisition Date                    DA: '20091229'
+(0008, 0023) Content Date                        DA: '20091229'
+(0008, 002a) Acquisition DateTime                DT: '20091229095915'
+(0008, 0030) Study Time                          TM: '095915'
+(0008, 0031) Series Time                         TM: '095915'
+(0008, 0032) Acquisition Time                    TM: '095915'
+(0008, 0033) Content Time                        TM: '095915'
+(0008, 0050) Accession Number                    SH: 'S07-100'
+(0008, 0060) Modality                            CS: 'SM'
+(0008, 0070) Manufacturer                        LO: 'Aperio'
+(0008, 0090) Referring Physician's Name          PN: '^^^^'
+(0008, 0110)  Coding Scheme Identification Sequence  2 item(s) ---- 
+   (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+   (0008, 010c) Coding Scheme UID                   UI: DICOM Controlled Terminology
+   (0008, 0112) Coding Scheme Registry              LO: 'HL7'
+   (0008, 0115) Coding Scheme Name                  ST: 'DICOM Controlled Terminology'
+   ---------
+   (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+   (0008, 010c) Coding Scheme UID                   UI: 2.16.840.1.113883.6.96
+   (0008, 0112) Coding Scheme Registry              LO: 'HL7'
+   (0008, 0115) Coding Scheme Name                  ST: 'SNOMED-CT using SNOMED-RT style values'
+   ---------
+(0008, 0201) Timezone Offset From UTC            SH: '-0500'
+(0008, 1090) Manufacturer's Model Name           LO: 'com.pixelmed.convert.TIFFToDicom'
+(0008, 9206) Volumetric Properties               CS: 'VOLUME'
+(0010, 0010) Patient's Name                      PN: 'PixelMed^AperioCMU-1'
+(0010, 0020) Patient ID                          LO: 'PX7832548325932'
+(0010, 0030) Patient's Birth Date                DA: ''
+(0010, 0040) Patient's Sex                       CS: ''
+(0018, 1000) Device Serial Number                LO: '1a0972e83993e25f:74ea4ac4:168e42344f2:-7fe2'
+(0018, 1020) Software Versions                   LO: 'Tue Feb 12 18:10:22 EST 2019'
+(0018, 9004) Content Qualification               CS: 'RESEARCH'
+(0018, a001)  Contributing Equipment Sequence  1 item(s) ---- 
+   (0008, 0070) Manufacturer                        LO: 'PixelMed'
+   (0008, 0080) Institution Name                    LO: 'PixelMed'
+   (0008, 0081) Institution Address                 ST: 'Bangor, PA'
+   (0008, 1040) Institutional Department Name       LO: 'Software Development'
+   (0008, 1090) Manufacturer's Model Name           LO: 'com.pixelmed.apps.SetCharacteristicsFromSummary'
+   (0018, 1020) Software Versions                   LO: 'Vers. Tue Feb 12 18:10:22 EST 2019'
+   (0018, a002) Contribution DateTime               DT: '20190212191333.186-0500'
+   (0018, a003) Contribution Description            ST: 'Set characteristics from summary'
+   (0040, a170)  Purpose of Reference Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '109103'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'Modifying Equipment'
+      ---------
+   ---------
+(0020, 000d) Study Instance UID                  UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.29.0
+(0020, 000e) Series Instance UID                 UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.28.0
+(0020, 0010) Study ID                            SH: 'S07-100'
+(0020, 0011) Series Number                       IS: '1'
+(0020, 0013) Instance Number                     IS: '4'
+(0020, 0020) Patient Orientation                 CS: ''
+(0020, 0052) Frame of Reference UID              UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.31.0
+(0020, 1040) Position Reference Indicator        LO: ''
+(0020, 9221)  Dimension Organization Sequence  1 item(s) ---- 
+   (0020, 9164) Dimension Organization UID          UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0
+   ---------
+(0020, 9222)  Dimension Index Sequence  2 item(s) ---- 
+   (0020, 9164) Dimension Organization UID          UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0
+   (0020, 9165) Dimension Index Pointer             AT: (0048, 021f)
+   (0020, 9167) Functional Group Pointer            AT: (0048, 021a)
+   (0020, 9421) Dimension Description Label         LO: 'Row Position'
+   ---------
+   (0020, 9164) Dimension Organization UID          UI: 1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0
+   (0020, 9165) Dimension Index Pointer             AT: (0048, 021e)
+   (0020, 9167) Functional Group Pointer            AT: (0048, 021a)
+   (0020, 9421) Dimension Description Label         LO: 'Column Position'
+   ---------
+(0020, 9311) Dimension Organization Type         CS: 'TILED_FULL'
+(0028, 0002) Samples per Pixel                   US: 3
+(0028, 0004) Photometric Interpretation          CS: 'RGB'
+(0028, 0006) Planar Configuration                US: 0
+(0028, 0008) Number of Frames                    IS: '108'
+(0028, 0010) Rows                                US: 256
+(0028, 0011) Columns                             US: 256
+(0028, 0100) Bits Allocated                      US: 8
+(0028, 0101) Bits Stored                         US: 8
+(0028, 0102) High Bit                            US: 7
+(0028, 0103) Pixel Representation                US: 0
+(0028, 0301) Burned In Annotation                CS: 'NO'
+(0028, 0302) Recognizable Visual Features        CS: 'NO'
+(0028, 2110) Lossy Image Compression             CS: '00'
+(0040, 0512) Container Identifier                LO: 'S07-100 A 5 1'
+(0040, 0513)  Issuer of the Container Identifier Sequence  0 item(s) ---- 
+(0040, 0518)  Container Type Code Sequence  1 item(s) ---- 
+   (0008, 0100) Code Value                          SH: 'A-0101B'
+   (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+   (0008, 0104) Code Meaning                        LO: 'Microscope slide'
+   ---------
+(0040, 0555)  Acquisition Context Sequence  0 item(s) ---- 
+(0040, 0560)  Specimen Description Sequence  1 item(s) ---- 
+   (0008, 2228)  Primary Anatomic Structure Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: 'T-28600'
+      (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+      (0008, 0104) Code Meaning                        LO: 'Left Upper Lobe of Lung'
+      ---------
+   (0040, 0551) Specimen Identifier                 LO: 'S07-100 A 5 1'
+   (0040, 0554) Specimen UID                        UI: 1.2.840.99790.986.33.1677.1.1.19.5
+   (0040, 0562)  Issuer of the Specimen Identifier Sequence  0 item(s) ---- 
+   (0040, 0600) Specimen Short Description          LO: 'Part A: LEFT UPPER LOBE, Block 5: Mass (2 pc), Slide 1: H&E'
+   (0040, 0602) Specimen Detailed Description       UT: Array of 660 elements
+   (0040, 0610)  Specimen Preparation Sequence  1 item(s) ---- 
+      (0040, 0612)  Specimen Preparation Step Content Item Sequence  4 item(s) ---- 
+         (0040, a040) Value Type                          CS: 'TEXT'
+         (0040, a043)  Concept Name Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: '121041'
+            (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+            (0008, 0104) Code Meaning                        LO: 'Specimen Identifier'
+            ---------
+         (0040, a160) Text Value                          UT: 'S07-100 A 5 1'
+         ---------
+         (0040, a040) Value Type                          CS: 'CODE'
+         (0040, a043)  Concept Name Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: '111701'
+            (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+            (0008, 0104) Code Meaning                        LO: 'Processing type'
+            ---------
+         (0040, a168)  Concept Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: 'P3-00003'
+            (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+            (0008, 0104) Code Meaning                        LO: 'Staining'
+            ---------
+         ---------
+         (0040, a040) Value Type                          CS: 'CODE'
+         (0040, a043)  Concept Name Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: 'G-C350'
+            (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+            (0008, 0104) Code Meaning                        LO: 'Using substance'
+            ---------
+         (0040, a168)  Concept Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: 'C-22968'
+            (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+            (0008, 0104) Code Meaning                        LO: 'hematoxylin stain'
+            ---------
+         ---------
+         (0040, a040) Value Type                          CS: 'CODE'
+         (0040, a043)  Concept Name Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: 'G-C350'
+            (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+            (0008, 0104) Code Meaning                        LO: 'Using substance'
+            ---------
+         (0040, a168)  Concept Code Sequence  1 item(s) ---- 
+            (0008, 0100) Code Value                          SH: 'C-22919'
+            (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+            (0008, 0104) Code Meaning                        LO: 'water soluble eosin stain'
+            ---------
+         ---------
+      ---------
+   ---------
+(0048, 0001) Imaged Volume Width                 FL: 23.0
+(0048, 0002) Imaged Volume Height                FL: 16.45599937438965
+(0048, 0003) Imaged Volume Depth                 FL: 0.0
+(0048, 0006) Total Pixel Matrix Columns          UL: 2875
+(0048, 0007) Total Pixel Matrix Rows             UL: 2057
+(0048, 0008)  Total Pixel Matrix Origin Sequence  1 item(s) ---- 
+   (0040, 072a) X Offset in Slide Coordinate System DS: '0.0'
+   (0040, 073a) Y Offset in Slide Coordinate System DS: '0.0'
+   ---------
+(0048, 0010) Specimen Label in Image             CS: 'NO'
+(0048, 0011) Focus Method                        CS: 'AUTO'
+(0048, 0012) Extended Depth of Field             CS: 'NO'
+(0048, 0015) Recommended Absent Pixel CIELab Val US: [65535, 0, 0]
+(0048, 0102) Image Orientation (Slide)           DS: [0, -1, 0, -1, 0, 0]
+(0048, 0105)  Optical Path Sequence  1 item(s) ---- 
+   (0022, 0016)  Illumination Type Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '111744'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'Brightfield illumination'
+      ---------
+   (0028, 2000) ICC Profile                         OB: Array of 141992 elements
+   (0048, 0106) Optical Path Identifier             SH: '1'
+   (0048, 0108)  Illumination Color Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: 'R-102C0'
+      (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+      (0008, 0104) Code Meaning                        LO: 'Full Spectrum'
+      ---------
+   ---------
+(0048, 0302) Number of Optical Paths             UL: 1
+(0048, 0303) Total Pixel Matrix Focal Planes     UL: 1
+(5200, 9229)  Shared Functional Groups Sequence  1 item(s) ---- 
+   (0028, 9110)  Pixel Measures Sequence  1 item(s) ---- 
+      (0018, 0050) Slice Thickness                     DS: '0.0'
+      (0028, 0030) Pixel Spacing                       DS: [.008, .008]
+      ---------
+   (0040, 0710)  Whole Slide Microscopy Image Frame Type Sequence  1 item(s) ---- 
+      (0008, 9007) Frame Type                          CS: ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
+      ---------
+   ---------
+(7fdf, 0010) Private Creator                     LO: 'PixelMed Publishing'
+(7fdf, 1001)  Private tag data  4 item(s) ---- 
+   (0028, 0002) Samples per Pixel                   US: 3
+   (0028, 0004) Photometric Interpretation          CS: 'YBR_FULL_422'
+   (0028, 0006) Planar Configuration                US: 0
+   (0028, 0008) Number of Frames                    IS: '30'
+   (0028, 0010) Rows                                US: 256
+   (0028, 0011) Columns                             US: 256
+   (0028, 0100) Bits Allocated                      US: 8
+   (0028, 0101) Bits Stored                         US: 8
+   (0028, 0102) High Bit                            US: 7
+   (0048, 0006) Total Pixel Matrix Columns          UL: 1437
+   (0048, 0007) Total Pixel Matrix Rows             UL: 1028
+   (7fe0, 0010) Pixel Data                          OB: Array of 592092 elements
+   ---------
+   (0028, 0002) Samples per Pixel                   US: 3
+   (0028, 0004) Photometric Interpretation          CS: 'YBR_FULL_422'
+   (0028, 0006) Planar Configuration                US: 0
+   (0028, 0008) Number of Frames                    IS: '9'
+   (0028, 0010) Rows                                US: 256
+   (0028, 0011) Columns                             US: 256
+   (0028, 0100) Bits Allocated                      US: 8
+   (0028, 0101) Bits Stored                         US: 8
+   (0028, 0102) High Bit                            US: 7
+   (0048, 0006) Total Pixel Matrix Columns          UL: 718
+   (0048, 0007) Total Pixel Matrix Rows             UL: 514
+   (7fe0, 0010) Pixel Data                          OB: Array of 176396 elements
+   ---------
+   (0028, 0002) Samples per Pixel                   US: 3
+   (0028, 0004) Photometric Interpretation          CS: 'YBR_FULL_422'
+   (0028, 0006) Planar Configuration                US: 0
+   (0028, 0008) Number of Frames                    IS: '4'
+   (0028, 0010) Rows                                US: 256
+   (0028, 0011) Columns                             US: 256
+   (0028, 0100) Bits Allocated                      US: 8
+   (0028, 0101) Bits Stored                         US: 8
+   (0028, 0102) High Bit                            US: 7
+   (0048, 0006) Total Pixel Matrix Columns          UL: 359
+   (0048, 0007) Total Pixel Matrix Rows             UL: 257
+   (7fe0, 0010) Pixel Data                          OB: Array of 57400 elements
+   ---------
+   (0028, 0002) Samples per Pixel                   US: 3
+   (0028, 0004) Photometric Interpretation          CS: 'YBR_FULL_422'
+   (0028, 0006) Planar Configuration                US: 0
+   (0028, 0008) Number of Frames                    IS: '1'
+   (0028, 0010) Rows                                US: 256
+   (0028, 0011) Columns                             US: 256
+   (0028, 0100) Bits Allocated                      US: 8
+   (0028, 0101) Bits Stored                         US: 8
+   (0028, 0102) High Bit                            US: 7
+   (0048, 0006) Total Pixel Matrix Columns          UL: 179
+   (0048, 0007) Total Pixel Matrix Rows             UL: 128
+   (7fe0, 0010) Pixel Data                          OB: Array of 17538 elements
+   ---------
+(7fe0, 0010) Pixel Data                          OB: Array of 1694516 elements
+(fffc, fffc) Data Set Trailing Padding           OB: Array of 714052 elements
