@@ -135,3 +135,6 @@ mosaicvenv/
 # Exclude Python built files
 *.pyc
 __pycache__/
+
+# Exclude MacOS .DS_Store files
+*.DS_Store
