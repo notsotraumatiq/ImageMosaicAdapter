@@ -4,8 +4,11 @@ from PIL import Image
 import pydicom
 import numpy as np
 from pydicom.uid import generate_uid
+import string
+import random
 
 # Add an optional suffix to the output file name for writing multiple files
+# Usage: python3 convertToDicom.py output_suffix
 suffix = ''
 if len(sys.argv) == 2:
     suffix = sys.argv[1]
@@ -38,6 +41,10 @@ for filename in os.listdir(input_dir):
     implementationClassUID = '1.2.40.13.1.3'
     prefix = implementationClassUID + '.'
 
+    # Create a random studyId of 7 alphanumeric digits
+    # This will eventually be changed to reflect an actual studyId
+    studyId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
+
     # Generate uid for SOPInstanceUID
     sopInstanceUID = generate_uid(prefix=prefix)
 
@@ -49,28 +56,13 @@ for filename in os.listdir(input_dir):
     ds.ImageType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
     ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
     ds.SOPInstanceUID = sopInstanceUID
-    ds.AccessionNumber = 'S07-100'
+    ds.AccessionNumber = studyId
     ds.Modality = 'SM' # Slide Microscopy
-
-    # Coding Scheme Sequence
-    codingSchemeDCM = pydicom.dataset.Dataset()
-    codingSchemeDCM.CodingSchemeDesignator = 'DCM'
-    codingSchemeDCM.CodingSchemeUID = '1.2.840.10008.2.16.4'
-    codingSchemeDCM.CodingSchemeRegistry = 'HL7'
-    codingSchemeDCM.CodingSchemeName = 'DICOM Controlled Terminology'
-
-    codingSchemeSRT = pydicom.dataset.Dataset()
-    codingSchemeSRT.CodingSchemeDesignator = 'SRT'
-    codingSchemeSRT.CodingSchemeUID = '2.16.840.1.113883.6.96'
-    codingSchemeSRT.CodingSchemeRegistry = 'HL7'
-    codingSchemeSRT.CodingSchemeName = 'SNOMED-CT using SNOMED-RT style values'
-
-    ds.CodingSchemeIdentificationSequence = pydicom.sequence.Sequence([codingSchemeDCM, codingSchemeSRT])
 
     # Study / Series Information
     ds.StudyInstanceUID = generate_uid(prefix=prefix)
     ds.SeriesInstanceUID = generate_uid(prefix=prefix)
-    ds.StudyID = 'S07-100'
+    ds.StudyID = studyId
     ds.SeriesNumber = '1'
     ds.InstanceNumber = '1'
 
@@ -97,21 +89,6 @@ for filename in os.listdir(input_dir):
     ds.DimensionIndexSequence = diSequence
 
     ds.DimensionOrganizationType = 'TILED_FULL'
-
-    ds.BurnedInAnnotation = 'NO'
-    ds.RecognizableVisualFeatures = 'NO'
-    ds.LossyImageCompression = '00'
-    ds.ContainerIdentifier = 'S07-100 A 5 1'
-
-    ds.IssuerOfTheContainerIdentifierSequence = pydicom.sequence.Sequence([])
-
-    containerTypeCode = pydicom.dataset.Dataset()
-    containerTypeCode.CodeValue = 'A-0101B'
-    containerTypeCode.CodingSchemeDesignator = 'SRT'
-    containerTypeCode.CodeMeaning = 'Microscope slide'
-    ds.ContainerTypeCodeSequence = pydicom.sequence.Sequence([containerTypeCode])
-
-    ds.AcquisitionContextSequence = pydicom.sequence.Sequence([])
 
     # Image Data
     ds.ImagedVolumeWidth = 23.0
