@@ -91,9 +91,6 @@ for filename in os.listdir(input_dir):
     ds.DimensionOrganizationType = 'TILED_FULL'
 
     # Image Data
-    ds.ImagedVolumeWidth = 23.0
-    ds.ImagedVolumeHeight = 16.45599937438965
-    ds.ImagedVolumeDepth = 0.0
     ds.TotalPixelMatrixColumns = 656
     ds.TotalPixelMatrixRows = 656
 
@@ -102,11 +99,7 @@ for filename in os.listdir(input_dir):
     pixelMatrixOrigin.YOffsetInSlideCoordinateSystem = '0.0'
     ds.TotalPixelMatrixOriginSequence = pydicom.sequence.Sequence([pixelMatrixOrigin])
 
-    ds.SpecimenLabelInImage = 'NO'
-    ds.FocusMethod = 'AUTO'
-    ds.ExtendedDepthOfField = 'NO'
-    ds.RecommendedAbsentPixelCIELabValue = [65535, 0, 0]
-    ds.ImageOrientationSlide = [0, -1, 0, -1, 0, 0]
+    ds.ImageOrientationSlide = [0, -1, 0, -1, 0, 0] # necessary
 
     # Optical Path Data
     illumTypeCode = pydicom.dataset.Dataset()
@@ -146,7 +139,6 @@ for filename in os.listdir(input_dir):
     sfgSequence = pydicom.sequence.Sequence([sharedFuncGroup])
 
     ds.SharedFunctionalGroupsSequence = sfgSequence
-
 
     ###################################################################
     ###################################################################
