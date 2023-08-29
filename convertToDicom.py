@@ -4,6 +4,11 @@ from PIL import Image
 import pydicom
 import numpy as np
 
+# Add an optional suffix to the output file name for writing multiple files
+suffix = ''
+if len(sys.argv) == 2:
+    suffix = sys.argv[1]
+
 # For now, just take a pre-converted dicom,
 # And experiment with changing certain settings until viewable in viewer
 input_dir = './images/dicom-trials/input'
@@ -18,8 +23,8 @@ for filename in os.listdir(input_dir):
     dicom_path = os.path.join(input_dir, filename)
     try:
         ds = pydicom.dcmread(dicom_path)
-    except:
-        print(f"Could not read dicom input file")
+    except Exception as error:
+        print(f"Could not read dicom input file", error)
         sys.exit(1)
 
     ###################################################################
@@ -33,22 +38,22 @@ for filename in os.listdir(input_dir):
     ds.file_meta.SourceApplicationEntityTitle = 'OURAETITLE'
 
     ds.ImageType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
-    ds.InstanceCreationDate = '20190212'
-    ds.InstanceCreationTime = '191333.182'
-    ds.InstanceCreatorUID = '1.3.6.1.4.1.5962.99.3'
+    # ds.InstanceCreationDate = '20190212'
+    # ds.InstanceCreationTime = '191333.182'
+    # ds.InstanceCreatorUID = '1.3.6.1.4.1.5962.99.3'
     ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
     ds.SOPInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.27.0'
-    ds.StudyDate = '20091229'
-    ds.SeriesDate = '20091229'
-    ds.AcquisitionDate = '20091229'
-    ds.AcquisitionDateTime = '20091229095915'
-    ds.StudyTime = '095915'
-    ds.SeriesTime = '095915'
-    ds.AcquisitionTime = '095915'
+    # ds.StudyDate = '20091229'
+    # ds.SeriesDate = '20091229'
+    # ds.AcquisitionDate = '20091229'
+    # ds.AcquisitionDateTime = '20091229095915'
+    # ds.StudyTime = '095915'
+    # ds.SeriesTime = '095915'
+    # ds.AcquisitionTime = '095915'
     ds.AccessionNumber = 'S07-100'
     ds.Modality = 'SM' # Slide Microscopy
-    ds.Manufacturer = 'Aperio'
-    ds.ReferringPhysicianName = '^^^^'
+    # ds.Manufacturer = 'Aperio'
+    # ds.ReferringPhysicianName = '^^^^'
 
     # Coding Scheme Sequence
     codingSchemeDCM = pydicom.dataset.Dataset()
@@ -65,39 +70,39 @@ for filename in os.listdir(input_dir):
 
     ds.CodingSchemeIdentificationSequence = pydicom.sequence.Sequence([codingSchemeDCM, codingSchemeSRT])
     
-    ds.TimezoneOffsetFromUTC = '-0500'
-    ds.ManufacturerModelName = 'com.pixelmed.convert.TIFFToDicom'
-    ds.VolumetricProperties = 'VOLUME'
+    # ds.TimezoneOffsetFromUTC = '-0500'
+    # ds.ManufacturerModelName = 'com.pixelmed.convert.TIFFToDicom'
+    # ds.VolumetricProperties = 'VOLUME'
 
     # Patient Information
-    ds.PatientName = 'PixelMed^AperioCMU-1'
-    ds.PatientID = 'PX7832548325932'
-    ds.PatientBirthDate = ''
-    ds.PatientSex = ''
+    # ds.PatientName = 'PixelMed^AperioCMU-1'
+    # ds.PatientID = 'PX7832548325932'
+    # ds.PatientBirthDate = ''
+    # ds.PatientSex = ''
 
-    ds.DeviceSerialNumber = '1a0972e83993e25f:74ea4ac4:168e42344f2:-7fe2'
-    ds.SoftwareVersions = 'Tue Feb 12 18:10:22 EST 2019'
-    ds.ContentQualification = 'RESEARCH'
+    # ds.DeviceSerialNumber = '1a0972e83993e25f:74ea4ac4:168e42344f2:-7fe2'
+    # ds.SoftwareVersions = 'Tue Feb 12 18:10:22 EST 2019'
+    # ds.ContentQualification = 'RESEARCH'
 
     # Contributing Equipment Sequence
-    contributingEquipment = pydicom.dataset.Dataset()
-    contributingEquipment.Manufacturer = 'PixelMed'
-    contributingEquipment.InstitutionName = 'PixelMed'
-    contributingEquipment.InstitutionAddress = 'Bangor, PA'
-    contributingEquipment.ManufacturerModelName = 'com.pixelmed.apps.SetCharacteristicsFromSummary'
-    contributingEquipment.SoftwareVersions = 'Vers. Tue Feb 12 18:10:22 EST 2019'
-    contributingEquipment.ContributionDateTime = '20190212191333.186-0500'
-    contributingEquipment.ContributionDescription = 'Set characteristics from summary'
-    ceSequence = pydicom.sequence.Sequence([contributingEquipment])
+    # contributingEquipment = pydicom.dataset.Dataset()
+    # contributingEquipment.Manufacturer = 'PixelMed'
+    # contributingEquipment.InstitutionName = 'PixelMed'
+    # contributingEquipment.InstitutionAddress = 'Bangor, PA'
+    # contributingEquipment.ManufacturerModelName = 'com.pixelmed.apps.SetCharacteristicsFromSummary'
+    # contributingEquipment.SoftwareVersions = 'Vers. Tue Feb 12 18:10:22 EST 2019'
+    # contributingEquipment.ContributionDateTime = '20190212191333.186-0500'
+    # contributingEquipment.ContributionDescription = 'Set characteristics from summary'
+    # ceSequence = pydicom.sequence.Sequence([contributingEquipment])
 
-    purposeOfReferenceCode = pydicom.dataset.Dataset()
-    purposeOfReferenceCode.CodeValue = '109103'
-    purposeOfReferenceCode.CodingSchemeDesignator = 'DCM'
-    purposeOfReferenceCode.CodeMeaning = 'Modifying Equipment'
-    porcSequence = pydicom.sequence.Sequence([purposeOfReferenceCode])
+    # purposeOfReferenceCode = pydicom.dataset.Dataset()
+    # purposeOfReferenceCode.CodeValue = '109103'
+    # purposeOfReferenceCode.CodingSchemeDesignator = 'DCM'
+    # purposeOfReferenceCode.CodeMeaning = 'Modifying Equipment'
+    # porcSequence = pydicom.sequence.Sequence([purposeOfReferenceCode])
 
-    ds.ContributingEquipmentSequence = ceSequence
-    ds.ContributingEquipmentSequence[0].PurposeOfReferenceCodeSequence = porcSequence
+    # ds.ContributingEquipmentSequence = ceSequence
+    # ds.ContributingEquipmentSequence[0].PurposeOfReferenceCodeSequence = porcSequence
 
     # Study / Series Information
     ds.StudyInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.29.0'
@@ -106,9 +111,9 @@ for filename in os.listdir(input_dir):
     ds.SeriesNumber = '1'
     ds.InstanceNumber = '1'
 
-    ds.PatientOrientation = ''
-    ds.FrameOfReferenceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.31.0'
-    ds.PositionReferenceIndicator = ''
+    # ds.PatientOrientation = ''
+    # ds.FrameOfReferenceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.31.0'
+    # ds.PositionReferenceIndicator = ''
 
     # Dimension Data
     dimensionOrg = pydicom.dataset.Dataset()
@@ -147,8 +152,6 @@ for filename in os.listdir(input_dir):
     ds.ContainerTypeCodeSequence = pydicom.sequence.Sequence([containerTypeCode])
 
     ds.AcquisitionContextSequence = pydicom.sequence.Sequence([])
-
-    ## Specimen Description Info (not yet encoded) ##
 
     # Image Data
     ds.ImagedVolumeWidth = 23.0
@@ -212,7 +215,9 @@ for filename in os.listdir(input_dir):
     ###################################################################
 
     # Output the file to the output directory
-    output_path = os.path.join(output_dir, filename)
+    base_name, extension = os.path.splitext(filename)
+    output_filename = f"{base_name}{suffix}{extension}"
+    output_path = os.path.join(output_dir, output_filename)
     ds.save_as(output_path)
 
-    print(f"Modified version of {filename} stored in {output_dir}")
+    print(f"Modified version of {filename} stored as {output_path}")

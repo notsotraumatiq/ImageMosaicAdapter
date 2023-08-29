@@ -15,5 +15,5 @@ except:
     print(f"Could not read file at {dicom_file_path}")
     sys.exit(2)
 
-print()
+print(ds)
 
