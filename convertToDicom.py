@@ -3,6 +3,7 @@ import sys
 from PIL import Image
 import pydicom
 import numpy as np
+from pydicom.uid import generate_uid
 
 # Add an optional suffix to the output file name for writing multiple files
 suffix = ''
@@ -31,29 +32,25 @@ for filename in os.listdir(input_dir):
     ####    Hardcoding values taken from an example-dicom image    ####
     ###################################################################
 
-    ds.file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6'
-    ds.file_meta.MediaStorageSOPInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.27.0'
-    ds.file_meta.ImplementationClassUID = '1.3.6.1.4.1.5962.99.2'
-    ds.file_meta.ImplementationVersionName = 'PIXELMEDJAVA001'
+    ds.file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
+
+    # Implementation Prefix based off dcm4chee-arc docs
+    implementationClassUID = '1.2.40.13.1.3'
+    prefix = implementationClassUID + '.'
+
+    # Generate uid for SOPInstanceUID
+    sopInstanceUID = generate_uid(prefix=prefix)
+
+    ds.file_meta.MediaStorageSOPInstanceUID = sopInstanceUID
+    ds.file_meta.ImplementationClassUID = implementationClassUID # from dcm4chee-arc docs
+    ds.file_meta.ImplementationVersionName = 'dcm4che-5.xx.yy' # from dcm4chee-arc docs
     ds.file_meta.SourceApplicationEntityTitle = 'OURAETITLE'
 
     ds.ImageType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
-    # ds.InstanceCreationDate = '20190212'
-    # ds.InstanceCreationTime = '191333.182'
-    # ds.InstanceCreatorUID = '1.3.6.1.4.1.5962.99.3'
     ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
-    ds.SOPInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.27.0'
-    # ds.StudyDate = '20091229'
-    # ds.SeriesDate = '20091229'
-    # ds.AcquisitionDate = '20091229'
-    # ds.AcquisitionDateTime = '20091229095915'
-    # ds.StudyTime = '095915'
-    # ds.SeriesTime = '095915'
-    # ds.AcquisitionTime = '095915'
+    ds.SOPInstanceUID = sopInstanceUID
     ds.AccessionNumber = 'S07-100'
     ds.Modality = 'SM' # Slide Microscopy
-    # ds.Manufacturer = 'Aperio'
-    # ds.ReferringPhysicianName = '^^^^'
 
     # Coding Scheme Sequence
     codingSchemeDCM = pydicom.dataset.Dataset()
@@ -69,66 +66,29 @@ for filename in os.listdir(input_dir):
     codingSchemeSRT.CodingSchemeName = 'SNOMED-CT using SNOMED-RT style values'
 
     ds.CodingSchemeIdentificationSequence = pydicom.sequence.Sequence([codingSchemeDCM, codingSchemeSRT])
-    
-    # ds.TimezoneOffsetFromUTC = '-0500'
-    # ds.ManufacturerModelName = 'com.pixelmed.convert.TIFFToDicom'
-    # ds.VolumetricProperties = 'VOLUME'
-
-    # Patient Information
-    # ds.PatientName = 'PixelMed^AperioCMU-1'
-    # ds.PatientID = 'PX7832548325932'
-    # ds.PatientBirthDate = ''
-    # ds.PatientSex = ''
-
-    # ds.DeviceSerialNumber = '1a0972e83993e25f:74ea4ac4:168e42344f2:-7fe2'
-    # ds.SoftwareVersions = 'Tue Feb 12 18:10:22 EST 2019'
-    # ds.ContentQualification = 'RESEARCH'
-
-    # Contributing Equipment Sequence
-    # contributingEquipment = pydicom.dataset.Dataset()
-    # contributingEquipment.Manufacturer = 'PixelMed'
-    # contributingEquipment.InstitutionName = 'PixelMed'
-    # contributingEquipment.InstitutionAddress = 'Bangor, PA'
-    # contributingEquipment.ManufacturerModelName = 'com.pixelmed.apps.SetCharacteristicsFromSummary'
-    # contributingEquipment.SoftwareVersions = 'Vers. Tue Feb 12 18:10:22 EST 2019'
-    # contributingEquipment.ContributionDateTime = '20190212191333.186-0500'
-    # contributingEquipment.ContributionDescription = 'Set characteristics from summary'
-    # ceSequence = pydicom.sequence.Sequence([contributingEquipment])
-
-    # purposeOfReferenceCode = pydicom.dataset.Dataset()
-    # purposeOfReferenceCode.CodeValue = '109103'
-    # purposeOfReferenceCode.CodingSchemeDesignator = 'DCM'
-    # purposeOfReferenceCode.CodeMeaning = 'Modifying Equipment'
-    # porcSequence = pydicom.sequence.Sequence([purposeOfReferenceCode])
-
-    # ds.ContributingEquipmentSequence = ceSequence
-    # ds.ContributingEquipmentSequence[0].PurposeOfReferenceCodeSequence = porcSequence
 
     # Study / Series Information
-    ds.StudyInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.29.0'
-    ds.SeriesInstanceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.28.0'
-    ds.StudyID = 'S07-100' # Necessary
+    ds.StudyInstanceUID = generate_uid(prefix=prefix)
+    ds.SeriesInstanceUID = generate_uid(prefix=prefix)
+    ds.StudyID = 'S07-100'
     ds.SeriesNumber = '1'
     ds.InstanceNumber = '1'
 
-    # ds.PatientOrientation = ''
-    # ds.FrameOfReferenceUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.31.0'
-    # ds.PositionReferenceIndicator = ''
-
     # Dimension Data
+    dimensionOrgUID = generate_uid(prefix=prefix)
     dimensionOrg = pydicom.dataset.Dataset()
-    dimensionOrg.DimensionOrganizationUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0'
+    dimensionOrg.DimensionOrganizationUID = dimensionOrgUID
     doSequence = pydicom.sequence.Sequence([dimensionOrg])
     ds.DimensionOrganizationSequence = doSequence
 
     dimensionIndexRow = pydicom.dataset.Dataset()
-    dimensionIndexRow.DimensionOrganizationUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0'
+    dimensionIndexRow.DimensionOrganizationUID = dimensionOrgUID
     dimensionIndexRow.DimensionIndexPointer = (0x0048, 0x021f)
     dimensionIndexRow.FunctionalGroupPointer = (0x0048, 0x021a)
     dimensionIndexRow.DimensionDescriptionLabel = 'Row Position'
 
     dimensionIndexColumn = pydicom.dataset.Dataset()
-    dimensionIndexColumn.DimensionOrganizationUID = '1.3.6.1.4.1.5962.99.1.3827483890.1961511620.1550015743218.32.0'
+    dimensionIndexColumn.DimensionOrganizationUID = dimensionOrgUID
     dimensionIndexColumn.DimensionIndexPointer = (0x0048, 0x021e)
     dimensionIndexColumn.FunctionalGroupPointer = (0x0048, 0x021a)
     dimensionIndexColumn.DimensionDescriptionLabel = 'Column Position'
