@@ -1,0 +1,77 @@
+Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 218
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: VL Whole Slide Microscopy Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.2.40.13.1.3.50532545824391227669761318221637848373516183984621
+(0002, 0010) Transfer Syntax UID                 UI: JPEG Baseline (Process 1)
+(0002, 0012) Implementation Class UID            UI: 1.2.40.13.1.3
+(0002, 0013) Implementation Version Name         SH: 'dcm4che-5.xx.yy'
+(0002, 0016) Source Application Entity Title     AE: 'OURAETITLE'
+-------------------------------------------------
+(0008, 0008) Image Type                          CS: ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
+(0008, 0016) SOP Class UID                       UI: VL Whole Slide Microscopy Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.2.40.13.1.3.50532545824391227669761318221637848373516183984621
+(0008, 0050) Accession Number                    SH: 'SNYQ6WN'
+(0008, 0060) Modality                            CS: 'SM'
+(0020, 000d) Study Instance UID                  UI: 1.2.40.13.1.3.10430313582679092463896440988671794245480119488298
+(0020, 000e) Series Instance UID                 UI: 1.2.40.13.1.3.12273453023332978709818456999367117069255406278144
+(0020, 0010) Study ID                            SH: 'SNYQ6WN'
+(0020, 0011) Series Number                       IS: '1'
+(0020, 0013) Instance Number                     IS: '1'
+(0020, 9221)  Dimension Organization Sequence  1 item(s) ---- 
+   (0020, 9164) Dimension Organization UID          UI: 1.2.40.13.1.3.11747468563185062112065776982814882326886183800414
+   ---------
+(0020, 9222)  Dimension Index Sequence  2 item(s) ---- 
+   (0020, 9164) Dimension Organization UID          UI: 1.2.40.13.1.3.11747468563185062112065776982814882326886183800414
+   (0020, 9165) Dimension Index Pointer             AT: (0048, 021f)
+   (0020, 9167) Functional Group Pointer            AT: (0048, 021a)
+   (0020, 9421) Dimension Description Label         LO: 'Row Position'
+   ---------
+   (0020, 9164) Dimension Organization UID          UI: 1.2.40.13.1.3.11747468563185062112065776982814882326886183800414
+   (0020, 9165) Dimension Index Pointer             AT: (0048, 021e)
+   (0020, 9167) Functional Group Pointer            AT: (0048, 021a)
+   (0020, 9421) Dimension Description Label         LO: 'Column Position'
+   ---------
+(0020, 9311) Dimension Organization Type         CS: 'TILED_FULL'
+(0028, 0002) Samples per Pixel                   US: 3
+(0028, 0004) Photometric Interpretation          CS: 'RGB'
+(0028, 0006) Planar Configuration                US: 0
+(0028, 0008) Number of Frames                    IS: '1'
+(0028, 0010) Rows                                US: 656
+(0028, 0011) Columns                             US: 656
+(0028, 0100) Bits Allocated                      US: 8
+(0028, 0101) Bits Stored                         US: 8
+(0028, 0102) High Bit                            US: 7
+(0028, 0103) Pixel Representation                US: 0
+(0048, 0006) Total Pixel Matrix Columns          UL: 656
+(0048, 0007) Total Pixel Matrix Rows             UL: 656
+(0048, 0008)  Total Pixel Matrix Origin Sequence  1 item(s) ---- 
+   (0040, 072a) X Offset in Slide Coordinate System DS: '0.0'
+   (0040, 073a) Y Offset in Slide Coordinate System DS: '0.0'
+   ---------
+(0048, 0102) Image Orientation (Slide)           DS: [0.0, -1.0, 0.0, -1.0, 0.0, 0.0]
+(0048, 0105)  Optical Path Sequence  1 item(s) ---- 
+   (0022, 0016)  Illumination Type Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: '111744'
+      (0008, 0102) Coding Scheme Designator            SH: 'DCM'
+      (0008, 0104) Code Meaning                        LO: 'Brightfield illumination'
+      ---------
+   (0048, 0106) Optical Path Identifier             SH: '1'
+   (0048, 0108)  Illumination Color Code Sequence  1 item(s) ---- 
+      (0008, 0100) Code Value                          SH: 'R-102C0'
+      (0008, 0102) Coding Scheme Designator            SH: 'SRT'
+      (0008, 0104) Code Meaning                        LO: 'Full Spectrum'
+      ---------
+   ---------
+(0048, 0302) Number of Optical Paths             UL: 1
+(0048, 0303) Total Pixel Matrix Focal Planes     UL: 1
+(5200, 9229)  Shared Functional Groups Sequence  1 item(s) ---- 
+   (0028, 9110)  Pixel Measures Sequence  1 item(s) ---- 
+      (0018, 0050) Slice Thickness                     DS: '0.0'
+      (0028, 0030) Pixel Spacing                       DS: [0.008, 0.008]
+      ---------
+   (0040, 0710)  Whole Slide Microscopy Image Frame Type Sequence  1 item(s) ---- 
+      (0008, 9007) Frame Type                          CS: ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
+      ---------
+   ---------
+(7fe0, 0010) Pixel Data                          OW: Array of 215642 elements
