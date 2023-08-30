@@ -23,13 +23,41 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Loop through input directory images
 for filename in os.listdir(input_dir):
-    # Read the example DICOM image
-    dicom_path = os.path.join(input_dir, filename)
-    try:
-        ds = pydicom.dcmread(dicom_path)
-    except Exception as error:
-        print(f"Could not read dicom input file", error)
-        sys.exit(1)
+    image_path = os.path.join(input_dir, filename)
+
+    # If the input file is a dicom image...
+    if filename.endswith((".dcm", ".dicom")):
+        try:
+            ds = pydicom.dcmread(image_path)
+        except Exception as error:
+            print(f"Could not read dicom input file", error)
+            sys.exit(1)
+
+    # If the input file is a png image...
+    elif filename.endswith(".png"):
+        try:
+            png_image = Image.open(image_path)
+        except Exception as error:
+            print(f"Could not read png input file", error)
+            sys.exit(1)
+        
+        ds = pydicom.dataset.Dataset()
+        ds.file_meta = pydicom.dataset.Dataset()
+        ds.SamplesPerPixel = 3
+        ds.PhotometricInterpretation = 'RGB'
+        ds.PlanarConfiguration = 0
+        ds.NumberOfFrames = '1'
+        ds.Rows = png_image.height
+        ds.Columns = png_image.width
+        ds.BitsAllocated = 8
+        ds.BitsStored = 8
+        ds.HighBit = 7
+        ds.PixelRepresentation = 0
+        ds.PixelData = png_image.tobytes()
+
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+
 
     ###################################################################
     ####    Hardcoding values taken from an example-dicom image    ####
@@ -91,8 +119,8 @@ for filename in os.listdir(input_dir):
     ds.DimensionOrganizationType = 'TILED_FULL'
 
     # Image Data
-    ds.TotalPixelMatrixColumns = 656
-    ds.TotalPixelMatrixRows = 656
+    ds.TotalPixelMatrixColumns = 656*4
+    ds.TotalPixelMatrixRows = 656*4
 
     pixelMatrixOrigin = pydicom.dataset.Dataset()
     pixelMatrixOrigin.XOffsetInSlideCoordinateSystem = '0.0'
@@ -145,7 +173,7 @@ for filename in os.listdir(input_dir):
 
     # Output the file to the output directory
     base_name, extension = os.path.splitext(filename)
-    output_filename = f"{base_name}{suffix}{extension}"
+    output_filename = f"{base_name}{suffix}.dicom"
     output_path = os.path.join(output_dir, output_filename)
     ds.save_as(output_path)
 
