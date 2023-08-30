@@ -1,7 +1,8 @@
 const express = require('express');
 const sharp = require('sharp');
-const fs = require('fs/promises');
+const fs = require('fs');
 const path = require('path');
+const e = require('express');
 
 const app = express();
 app.use(express.json());
@@ -76,9 +77,11 @@ app.use(express.json());
   }
 
 
-async function createMosaic(gridData, padding=0) {
+async function createMosaic(gridData, cellType, padding=0) {
   const mosaicRows = gridData[0].length;
   const mosaicCols = gridData[0][0].length;
+  // const mosaicRows = 5;
+  // const mosaicCols = 5;
   const gridLineWidth = 1; // width of the grid lines in pixels
   // const baseDir = 'images/cells/charger66';
   const baseDir = 'images/cells/fna_violo_patch/violo_patch';
@@ -92,6 +95,9 @@ async function createMosaic(gridData, padding=0) {
   for (let row = 0; row < mosaicRows; row++) {
     for (let col = 0; col < mosaicCols; col++) {
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
+      if (!fs.existsSync(imageFile)) { 
+        continue; 
+      } 
       const { width, height } = await getImageDimensions(imageFile);
       maxCellWidth = Math.max(maxCellWidth, width);
       maxCellHeight = Math.max(maxCellHeight, height);
@@ -117,34 +123,43 @@ async function createMosaic(gridData, padding=0) {
     }
   });
 
+  // Create a blank image to use as the background for any empty cells
+  (async () => {
+    // const blankImageBuffer = await createBlankImage(maxCellWidth, maxCellHeight, { r: 0, g: 0, b: 0 }); // Black image
+
+    // If you wanted to save it to a file:
+    // await sharp(blankImageBuffer).toFile('blankImage.png');
+  })();
+
   // Draw each image onto the canvas at the correct position with padding
   for (let row = 0; row < mosaicRows; row++) {
     for (let col = 0; col < mosaicCols; col++) {
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
-      const { width, height } = await getImageDimensions(imageFile);
-      // const xOffset = col * maxCellWidth + Math.ceil((maxCellWidth - width) / 2);
-      // const yOffset = row * maxCellHeight + Math.ceil((maxCellHeight - height) / 2);
 
-      // Create a white background for each image
-      const imageWithBackground = await sharp(imageFile)
-        .extend({
-          top: Math.ceil((maxCellHeight - height) / 2),
-          bottom: Math.ceil((maxCellHeight - height) / 2),
-          left: Math.ceil((maxCellWidth - width) / 2),
-          right: Math.ceil((maxCellWidth - width) / 2),
-          background: { r: 5, g: 5, b: 5, alpha: 1 }
-        })
-        .toBuffer();
+      const xOffset = col * (maxCellWidth + gridLineWidth) + gridLineWidth;
+      const yOffset = row * (maxCellHeight + gridLineWidth) + gridLineWidth;
 
-        const xOffset = col * (maxCellWidth + gridLineWidth) + gridLineWidth;
-        const yOffset = row * (maxCellHeight + gridLineWidth) + gridLineWidth;
-  
-        console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
-  
-        compositeOperations.push({ input: imageWithBackground, top: yOffset, left: xOffset });
+      if (!fs.existsSync(imageFile)) { 
+        const blankImageWithBackground = await createBlankImage(maxCellWidth, maxCellHeight, { r: 0, g: 0, b: 0 }); // Black image; 
+        compositeOperations.push({ input: blankImageWithBackground, top: yOffset, left: xOffset });
+        console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${maxCellWidth}, height: ${maxCellHeight}, imageFile: BLANK`);
+      } else {
+        const { width, height } = await getImageDimensions(imageFile);
 
-      console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
-      // compositeOperations.push({ input: imageFile, top: yOffset, left: xOffset });
+        // Create a white background for each image
+        const imageWithBackground = await sharp(imageFile)
+          .extend({
+            top: Math.ceil((maxCellHeight - height) / 2),
+            bottom: Math.ceil((maxCellHeight - height) / 2),
+            left: Math.ceil((maxCellWidth - width) / 2),
+            right: Math.ceil((maxCellWidth - width) / 2),
+            background: { r: 5, g: 5, b: 5, alpha: 1 }
+          })
+          .toBuffer();
+
+          compositeOperations.push({ input: imageWithBackground, top: yOffset, left: xOffset });
+          console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${width}, height: ${height}, imageFile: ${imageFile}`);
+      }
     }
   }
 
@@ -152,7 +167,7 @@ async function createMosaic(gridData, padding=0) {
   canvas = await canvas.composite(compositeOperations);
 
   // Write the mosaic to a file
-  await canvas.toFile(`images/mosaics/grid${grid}.png`);
+  await canvas.toFile(`images/mosaics/grid-${cellType}-${grid}.png`);
 }
 
 async function getImageDimensions(imageFilePath) {
@@ -168,6 +183,29 @@ async function getImageDimensions(imageFilePath) {
 
 function getGridData() {
   const gridData = [
+    [
+      [
+        "fld-q196-145867-1434,449-42,53-mast_cell.png",
+        "fld-q196-194606-1921,1439-44,46-mast_cell.png",
+        "fld-q196-197650-1024,283-138,204-mast_cell.png",
+        "fld-q310-212447-793,820-50,50-mast_cell.png",
+        "fld-q310-212469-137,712-51,52-mast_cell.png",
+      ],
+      [
+        "fld-q310-250901-282,730-55,56-mast_cell.png",
+        "fld-q310-354695-1044,889-62,57-mast_cell.png",
+        "fld-q310-354705-1593,484-61,68-mast_cell.png",
+        "fld-q310-86350-1132,807-61,57-mast_cell.png",
+        "fld-q548-130952-1890,63-52,55-mast_cell.png"
+      ],
+      [
+        "fld-q548-130997-1118,363-62,64-mast_cell.png",
+        "fld-q548-131433-1561,500-45,43-mast_cell.png",
+      ],
+    ]
+  ];
+  
+  const rbcGridData = [
     [
       [
         "fld-q196-115217-466,937-28,24-nRBC.png",
@@ -216,6 +254,26 @@ function getGridData() {
   return gridData;
 }
 
+// Generate a blank, in-memory image with a specific color
+async function createBlankImage(width, height, color) {
+  // Ensure color has an alpha channel, defaulting to 1 (fully opaque)
+  if (!color.alpha) {
+    color.alpha = 1;
+  }
+
+  const imageBuffer = await sharp({
+    create: {
+      width: width,
+      height: height,
+      channels: 4,
+      background: color
+    }
+  }).png().toBuffer(); // You can change this to .jpeg() if you prefer
+
+  return imageBuffer;
+}
+
+
 // Endpoint to create a mosaic from the grid of images
 app.get('/create-mosaic', async (req, res) => {
   // const gridData = req.body;
@@ -245,7 +303,7 @@ app.get('/create-mosaic', async (req, res) => {
   }
 
   try {
-    await createMosaic(gridData, padding);
+    await createMosaic(gridData, "mast" , padding);
     res.send('Mosaic created.');
   } catch (error) {
     console.error('Error creating mosaic:', error);
@@ -283,52 +341,3 @@ app.get('/convert-png-to-dicom', async (req, res) => {
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
-
-/*
-[
-  [
-    [
-      "fld-q196-115217-466,937-28,24-nRBC.png",
-      "fld-q310-42129-1571,364-28,28-nRBC.png",
-      "fld-q310-42132-1269,881-27,24-nRBC.png",
-      "fld-q310-42132-2196,1009-26,27-nRBC.png",
-      "fld-q310-42132-2243,540-29,28-nRBC.png",
-    ],
-    [
-      "fld-q310-47346-1184,1809-23,24-nRBC.png",
-      "fld-q310-47346-1436,1036-26,27-nRBC.png",
-      "fld-q310-47346-1585,379-21,21-nRBC.png",
-      "fld-q310-47346-1871,1289-25,25-nRBC.png",
-      "fld-q310-47346-2116,618-19,23-nRBC.png",
-    ],
-    [
-      "fld-q310-47346-2404,974-25,27-nRBC.png",
-      "fld-q310-47346-396,1041-24,23-nRBC.png",
-      "fld-q310-47346-776,719-27,26-nRBC.png",
-      "fld-q310-47347-1201,103-24,23-nRBC.png",
-      "fld-q310-47347-1490,1761-23,24-nRBC.png",
-    ],
-    [
-      "fld-q310-47347-1593,462-26,22-nRBC.png",
-      "fld-q310-47347-1822,1108-23,28-nRBC.png",
-      "fld-q310-47347-23,1264-23,20-nRBC.png",
-      "fld-q310-47347-2378,1216-24,23-nRBC.png",
-      "fld-q310-47347-562,1604-25,27-nRBC.png",
-    ],
-    [
-      "fld-q310-47347-724,1206-23,25-nRBC.png",
-      "fld-q310-55407-122,359-27,25-nRBC.png",
-      "fld-q310-55407-1307,1656-29,29-nRBC.png",
-      "fld-q310-55407-1644,1895-23,26-nRBC.png",
-      "fld-q310-55407-2565,1546-26,28-nRBC.png",
-    ],
-  ],
-  [
-    [
-      "fld-q310-55409-1099,287-29,22-nRBC.png",
-      "fld-q310-62157-2086,96-28,30-nRBC.png",
-      "fld-q310-62157-2290,912-27,32-nRBC.png",
-    ],
-  ],
-];
-*/
