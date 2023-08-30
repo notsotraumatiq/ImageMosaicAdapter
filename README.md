@@ -47,6 +47,10 @@ python convertToDicom.py
 ```
 * Note, this step will encode all images in the `images/dicom-trials/input` directory and store the converted **DICOM** images in `images/dicom-trials/output`. Since most of the metadata are hardcoded, likely there will be duplicate IDs resulting in issues storing separate images on the local webserver
 
+### Extract DICOM Files from Webserver
+`extract-dicom.py` currently extracts *DICOM* files from the **Slim** `demo` webserver (located at 'https://idc-external-006.uc.r.appspot.com/dcm4chee-arc/aets/DCM4CHEE/rs') and stores the files locally in the directory `images/slim-demo-dicoms`.
+* Note: this is hundreds of files so the output dir has been added to `.gitignore`. If you change the output dir, the files may get checked into git
+
 ### Storing Images on the DICOM Web Server
 **Storing Images from the CLI**
 
@@ -59,7 +63,14 @@ path/to/dicomfiles/*
 
 **Storing Images With the Python Script**
 
-The file `loadToDicomWebServer.py` will store all images located in the `images/dicom-images` directory:
+`loadToDicomWebServer.py` will store all images located in the specified directory to the webserver:
 ```
-python loadToDicomWebServer.py
+python loadToDicomWebServer.py path/to/files-to-store
 ```
+
+### Inspect DICOM
+`inspectDicom.py` will print the contents of the specified *DICOM* file to the terminal (or specified output source)
+```
+python inspectDicom.py path/to/dicom-file.dcm
+```
+

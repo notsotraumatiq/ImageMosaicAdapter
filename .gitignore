@@ -137,4 +137,7 @@ mosaicvenv/
 __pycache__/
 
 # Exclude MacOS .DS_Store files
-*.DS_Store
+# *.DS_Store
+
+# Exclude built slim-demo-dicoms
+/images/slim-demo-dicom*
