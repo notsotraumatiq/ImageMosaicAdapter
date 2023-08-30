@@ -12,13 +12,22 @@ else:
 server_url = 'http://localhost:8008/dcm4chee-arc/aets/DCM4CHEE/rs'
 client = DICOMwebClient(server_url)
 
+successfully_stored = 0
+errors_storing = 0
+
 for filename in os.listdir(dicom_dir):
     dicom_filepath = os.path.join(dicom_dir, filename)
     dataset = pydicom.dcmread(dicom_filepath)
-    response = client.store_instances([dataset])
     
-    if response.status_code == 200:
+    try:
+        client.store_instances([dataset])
+        successfully_stored += 1
         print(f"Stored {filename} successfully.")
-    else:
-        print(f"Failed to store {filename}. Status code: {response.status_code}")
-        print(f"response: {response.data}")
+    except Exception as error:
+        errors_storing += 1
+        print(f"Failed to store {filename}")
+        print(error)
+
+print(f"Finished storing dicom files")
+print(f"Successfully stored: {successfully_stored}")
+print(f"Errors storing: {errors_storing}")
