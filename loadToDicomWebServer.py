@@ -1,9 +1,13 @@
 import os
 import pydicom
 from dicomweb_client.api import DICOMwebClient
+import sys
 
-# dicom_dir = './images/dicom-images'
-dicom_dir = './images/dicom-trials/output'
+if len(sys.argv) == 2: 
+    dicom_dir = sys.argv[1]
+else:
+    print(f"Usage: python {sys.argv[0]} path/to/files-to-load")
+    sys.exit(1)
 
 server_url = 'http://localhost:8008/dcm4chee-arc/aets/DCM4CHEE/rs'
 client = DICOMwebClient(server_url)
