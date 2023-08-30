@@ -6,6 +6,7 @@ import numpy as np
 from pydicom.uid import generate_uid
 import string
 import random
+import tempfile
 
 # Add an optional suffix to the output file name for writing multiple files
 # Usage: python3 convertToDicom.py output_suffix
@@ -15,7 +16,7 @@ if len(sys.argv) == 2:
 
 # For now, just take a pre-converted dicom,
 # And experiment with changing certain settings until viewable in viewer
-input_dir = './images/dicom-trials/input'
+input_dir = './images/dicom-trials/input-png'
 output_dir = './images/dicom-trials/output'
 
 # Create ouput directory if it doesn't exist
@@ -24,6 +25,11 @@ os.makedirs(output_dir, exist_ok=True)
 # Loop through input directory images
 for filename in os.listdir(input_dir):
     image_path = os.path.join(input_dir, filename)
+
+    # Output path
+    base_name, extension = os.path.splitext(filename)
+    output_filename = f"{base_name}{suffix}.dicom"
+    output_path = os.path.join(output_dir, output_filename)
 
     # If the input file is a dicom image...
     if filename.endswith((".dcm", ".dicom")):
@@ -41,8 +47,16 @@ for filename in os.listdir(input_dir):
             print(f"Could not read png input file", error)
             sys.exit(1)
         
-        ds = pydicom.dataset.Dataset()
-        ds.file_meta = pydicom.dataset.Dataset()
+
+        np_image = np.array(png_image.getdata(), dtype=np.uint8)[:,:3]
+        file_meta = pydicom.dataset.FileMetaDataset()
+        tempfilename = tempfile.NamedTemporaryFile(suffix='dicom').name
+        ds = pydicom.dataset.FileDataset(tempfilename, {},
+                                         file_meta=file_meta, preamble=b"\0" * 128)
+        
+        # File Meta Data
+        ds.file_meta.FileMetaInformationVersion = b'\x00\x01'
+        ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
         ds.SamplesPerPixel = 3
         ds.PhotometricInterpretation = 'RGB'
         ds.PlanarConfiguration = 0
@@ -53,10 +67,10 @@ for filename in os.listdir(input_dir):
         ds.BitsStored = 8
         ds.HighBit = 7
         ds.PixelRepresentation = 0
-        ds.PixelData = png_image.tobytes()
-
+        ds.PixelData = np_image.tobytes()
         ds.is_little_endian = True
         ds.is_implicit_VR = False
+        # print(ds)
 
 
     ###################################################################
@@ -64,6 +78,11 @@ for filename in os.listdir(input_dir):
     ###################################################################
 
     ds.file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
+
+    # Adjusting number of frames, rows and columns
+    # ds.NumberOfFrames = '64'
+    # ds.Rows = int(ds.Rows / 8)
+    # ds.Columns = int(ds.Columns / 8)
 
     # Implementation Prefix based off dcm4chee-arc docs
     implementationClassUID = '1.2.40.13.1.3'
@@ -119,8 +138,8 @@ for filename in os.listdir(input_dir):
     ds.DimensionOrganizationType = 'TILED_FULL'
 
     # Image Data
-    ds.TotalPixelMatrixColumns = 656*4
-    ds.TotalPixelMatrixRows = 656*4
+    ds.TotalPixelMatrixColumns = ds.Columns
+    ds.TotalPixelMatrixRows = ds.Rows
 
     pixelMatrixOrigin = pydicom.dataset.Dataset()
     pixelMatrixOrigin.XOffsetInSlideCoordinateSystem = '0.0'
@@ -171,10 +190,6 @@ for filename in os.listdir(input_dir):
     ###################################################################
     ###################################################################
 
-    # Output the file to the output directory
-    base_name, extension = os.path.splitext(filename)
-    output_filename = f"{base_name}{suffix}.dicom"
-    output_path = os.path.join(output_dir, output_filename)
     ds.save_as(output_path)
 
     print(f"Modified version of {filename} stored as {output_path}")
