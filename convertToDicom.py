@@ -31,62 +31,20 @@ for filename in os.listdir(input_dir):
     output_filename = f"{base_name}{suffix}.dicom"
     output_path = os.path.join(output_dir, output_filename)
 
-    # If the input file is a dicom image...
-    if filename.endswith((".dcm", ".dicom")):
-        try:
-            ds = pydicom.dcmread(image_path)
-        except Exception as error:
-            print(f"Could not read dicom input file", error)
-            sys.exit(1)
+    # If the input file is not a png image...
+    if not filename.endswith(".png"):
+        print(f"{filename} is not a png file")
+        continue
 
-    # If the input file is a png image...
-    elif filename.endswith(".png"):
-        try:
-            png_image = Image.open(image_path)
-        except Exception as error:
-            print(f"Could not read png input file", error)
-            sys.exit(1)
+    try:
+        png_image = Image.open(image_path)
+    except Exception as error:
+        print(f"Could not read png input file", error)
+        sys.exit(1)
         
-
-        np_image = np.array(png_image.getdata(), dtype=np.uint8)[:,:3]
-        file_meta = pydicom.dataset.FileMetaDataset()
-        tempfilename = tempfile.NamedTemporaryFile(suffix='dicom').name
-        ds = pydicom.dataset.FileDataset(tempfilename, {},
-                                         file_meta=file_meta, preamble=b"\0" * 128)
-        
-        # File Meta Data
-        ds.file_meta.FileMetaInformationVersion = b'\x00\x01'
-        ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
-        ds.SamplesPerPixel = 3
-        ds.PhotometricInterpretation = 'RGB'
-        ds.PlanarConfiguration = 0
-        ds.NumberOfFrames = '1'
-        ds.Rows = png_image.height
-        ds.Columns = png_image.width
-        ds.BitsAllocated = 8
-        ds.BitsStored = 8
-        ds.HighBit = 7
-        ds.PixelRepresentation = 0
-        ds.PixelData = np_image.tobytes()
-        ds.is_little_endian = True
-        ds.is_implicit_VR = False
-        # print(ds)
-
-
-    ###################################################################
-    ####    Hardcoding values taken from an example-dicom image    ####
-    ###################################################################
-
-    ds.file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
-
-    # Adjusting number of frames, rows and columns
-    # ds.NumberOfFrames = '64'
-    # ds.Rows = int(ds.Rows / 8)
-    # ds.Columns = int(ds.Columns / 8)
-
-    # Implementation Prefix based off dcm4chee-arc docs
-    implementationClassUID = '1.2.40.13.1.3'
-    prefix = implementationClassUID + '.'
+    # Unique UID prefix
+    prefix = '1.2.826.0.1.3680043.10.1286' # Generated externally
+    implementationClassUID = prefix + '.1'
 
     # Create a random studyId of 7 alphanumeric digits
     # This will eventually be changed to reflect an actual studyId
@@ -95,10 +53,22 @@ for filename in os.listdir(input_dir):
     # Generate uid for SOPInstanceUID
     sopInstanceUID = generate_uid(prefix=prefix)
 
-    ds.file_meta.MediaStorageSOPInstanceUID = sopInstanceUID
-    ds.file_meta.ImplementationClassUID = implementationClassUID # from dcm4chee-arc docs
-    ds.file_meta.ImplementationVersionName = 'dcm4che-5.xx.yy' # from dcm4chee-arc docs
-    ds.file_meta.SourceApplicationEntityTitle = 'OURAETITLE'
+    # File Metadata
+    file_meta = pydicom.dataset.FileMetaDataset()
+    file_meta.FileMetaInformationVersion = b'\x00\x01'
+    file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
+    file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
+    file_meta.MediaStorageSOPInstanceUID = sopInstanceUID
+    file_meta.ImplementationClassUID = implementationClassUID
+    file_meta.ImplementationVersionName = '001' # Need to update
+    file_meta.SourceApplicationEntityTitle = 'DEXXAE' # Need to update
+
+    tempfilename = tempfile.NamedTemporaryFile(suffix='dicom').name
+    ds = pydicom.dataset.FileDataset(tempfilename, {},
+                                        file_meta=file_meta, preamble=b"\0" * 128)
+    ds.is_little_endian = True
+    ds.is_implicit_VR = False
+    
 
     ds.ImageType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
     ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
@@ -138,6 +108,20 @@ for filename in os.listdir(input_dir):
     ds.DimensionOrganizationType = 'TILED_FULL'
 
     # Image Data
+    ds.SamplesPerPixel = 3
+    ds.PhotometricInterpretation = 'RGB'
+    ds.PlanarConfiguration = 0
+    ds.NumberOfFrames = '1'
+    ds.Rows = png_image.height
+    ds.Columns = png_image.width
+    ds.BitsAllocated = 8
+    ds.BitsStored = 8
+    ds.HighBit = 7
+    ds.PixelRepresentation = 0
+
+    np_image = np.array(png_image.getdata(), dtype=np.uint8)[:,:3]
+    ds.PixelData = np_image.tobytes()
+    
     ds.TotalPixelMatrixColumns = ds.Columns
     ds.TotalPixelMatrixRows = ds.Rows
 
