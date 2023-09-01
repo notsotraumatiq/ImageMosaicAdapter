@@ -16,7 +16,7 @@ if len(sys.argv) == 2:
 
 # For now, just take a pre-converted dicom,
 # And experiment with changing certain settings until viewable in viewer
-input_dir = './images/dicom-trials/input-png'
+input_dir = './images/dicom-trials/input'
 output_dir = './images/dicom-trials/output'
 
 # Create ouput directory if it doesn't exist
