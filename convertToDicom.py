@@ -43,8 +43,8 @@ for filename in os.listdir(input_dir):
         sys.exit(1)
         
     # Unique UID prefix
-    prefix = '1.2.826.0.1.3680043.10.1286' # Generated externally
-    implementationClassUID = prefix + '.1'
+    prefix = '1.2.826.0.1.3680043.10.1286.' # Generated externally
+    implementationClassUID = prefix + '1'
 
     # Create a random studyId of 7 alphanumeric digits
     # This will eventually be changed to reflect an actual studyId
@@ -69,7 +69,6 @@ for filename in os.listdir(input_dir):
     ds.is_little_endian = True
     ds.is_implicit_VR = False
     
-
     ds.ImageType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
     ds.SOPClassUID = '1.2.840.10008.5.1.4.1.1.77.1.6' # VL Whole Slide Microscopy Image Storage
     ds.SOPInstanceUID = sopInstanceUID
@@ -121,7 +120,7 @@ for filename in os.listdir(input_dir):
 
     np_image = np.array(png_image.getdata(), dtype=np.uint8)[:,:3]
     ds.PixelData = np_image.tobytes()
-    
+
     ds.TotalPixelMatrixColumns = ds.Columns
     ds.TotalPixelMatrixRows = ds.Rows
 
@@ -174,6 +173,6 @@ for filename in os.listdir(input_dir):
     ###################################################################
     ###################################################################
 
-    ds.save_as(output_path)
+    ds.save_as(output_path, write_like_original=False)
 
     print(f"Modified version of {filename} stored as {output_path}")
