@@ -7,6 +7,7 @@ from pydicom.uid import generate_uid
 import string
 import random
 import tempfile
+from splitMosaic import split_image
 
 # Add an optional suffix to the output file name for writing multiple files
 # Usage: python3 convertToDicom.py output_suffix
@@ -26,11 +27,6 @@ os.makedirs(output_dir, exist_ok=True)
 for filename in os.listdir(input_dir):
     image_path = os.path.join(input_dir, filename)
 
-    # Output path
-    base_name, extension = os.path.splitext(filename)
-    output_filename = f"{base_name}{suffix}.dicom"
-    output_path = os.path.join(output_dir, output_filename)
-
     # If the input file is not a png image...
     if not filename.endswith(".png"):
         print(f"{filename} is not a png file")
@@ -41,7 +37,7 @@ for filename in os.listdir(input_dir):
     except Exception as error:
         print(f"Could not read png input file", error)
         sys.exit(1)
-        
+
     # Unique UID prefix
     prefix = '1.2.826.0.1.3680043.10.1286.' # Generated externally
     implementationClassUID = prefix + '1'
@@ -50,8 +46,11 @@ for filename in os.listdir(input_dir):
     # This will eventually be changed to reflect an actual studyId
     studyId = ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
 
-    # Generate uid for SOPInstanceUID
+    # Generate uuids
     sopInstanceUID = generate_uid(prefix=prefix)
+    studyInstanceUID = generate_uid(prefix=prefix)
+    seriesInstanceUID = generate_uid(prefix=prefix)
+    dimensionOrgUID = generate_uid(prefix=prefix)
 
     # File Metadata
     file_meta = pydicom.dataset.FileMetaDataset()
@@ -76,14 +75,12 @@ for filename in os.listdir(input_dir):
     ds.Modality = 'SM' # Slide Microscopy
 
     # Study / Series Information
-    ds.StudyInstanceUID = generate_uid(prefix=prefix)
-    ds.SeriesInstanceUID = generate_uid(prefix=prefix)
+    ds.StudyInstanceUID = studyInstanceUID
+    ds.SeriesInstanceUID = seriesInstanceUID
     ds.StudyID = studyId
-    ds.SeriesNumber = '1'
-    ds.InstanceNumber = '1'
+    ds.SeriesNumber = None # ?
 
     # Dimension Data
-    dimensionOrgUID = generate_uid(prefix=prefix)
     dimensionOrg = pydicom.dataset.Dataset()
     dimensionOrg.DimensionOrganizationUID = dimensionOrgUID
     doSequence = pydicom.sequence.Sequence([dimensionOrg])
@@ -107,27 +104,16 @@ for filename in os.listdir(input_dir):
     ds.DimensionOrganizationType = 'TILED_FULL'
 
     # Image Data
+    print(f"width: {png_image.width}, height: {png_image.height}")
+    ds.Rows = png_image.height
+    ds.Columns = png_image.width
     ds.SamplesPerPixel = 3
     ds.PhotometricInterpretation = 'RGB'
     ds.PlanarConfiguration = 0
-    ds.NumberOfFrames = '1'
-    ds.Rows = png_image.height
-    ds.Columns = png_image.width
     ds.BitsAllocated = 8
     ds.BitsStored = 8
     ds.HighBit = 7
     ds.PixelRepresentation = 0
-
-    np_image = np.array(png_image.getdata(), dtype=np.uint8)[:,:3]
-    ds.PixelData = np_image.tobytes()
-
-    ds.TotalPixelMatrixColumns = ds.Columns
-    ds.TotalPixelMatrixRows = ds.Rows
-
-    pixelMatrixOrigin = pydicom.dataset.Dataset()
-    pixelMatrixOrigin.XOffsetInSlideCoordinateSystem = '0.0'
-    pixelMatrixOrigin.YOffsetInSlideCoordinateSystem = '0.0'
-    ds.TotalPixelMatrixOriginSequence = pydicom.sequence.Sequence([pixelMatrixOrigin])
 
     ds.ImageOrientationSlide = [0, -1, 0, -1, 0, 0] # necessary
 
@@ -154,25 +140,105 @@ for filename in os.listdir(input_dir):
     ds.NumberOfOpticalPaths = 1
     ds.TotalPixelMatrixFocalPlanes = 1
 
-    pixelMeasures = pydicom.dataset.Dataset()
-    pixelMeasures.SliceThickness = '0.0'
-    pixelMeasures.PixelSpacing = [.008, .008]
-    pmSequence = pydicom.sequence.Sequence([pixelMeasures])
+    np_image = np.array(png_image.getdata(), dtype=np.uint16)[:,:3]
+    # img_array = np.array(png_image)
+    # ds.PixelData = np_image.tobytes()
 
-    wsmImageFrameType = pydicom.dataset.Dataset()
-    wsmImageFrameType.FrameType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
-    wsmiftSequence = pydicom.sequence.Sequence([wsmImageFrameType])
+    # For each image, create 3 separate resolutions:
+    # resolutions = [
+    #     {
+    #         'name': 'highRes',
+    #         'numberOfFrames': 182,
+    #         'width_factor': 12,
+    #         'height_factor': 12,
+    #         'pixelSpacing': [0.0009706, 0.0009701]
+    #     },
+    #     {
+    #         'name': 'medRes',
+    #         'numberOfFrames': 49,
+    #         'width_factor': 6,
+    #         'height_factor': 6,
+    #         'pixelSpacing': [0.0019412, 0.0019403]
+    #     },
+    #     {
+    #         'name': 'lowRes',
+    #         'numberOfFrames': 9,
+    #         'width_factor': 3,
+    #         'height_factor': 3,
+    #         'pixelSpacing': [0.0038824, 0.0038806]
+    #     }
+    # ]
+    # for res in resolutions:
 
-    sharedFuncGroup = pydicom.dataset.Dataset()
-    sharedFuncGroup.PixelMeasuresSequence = pmSequence
-    sharedFuncGroup.WholeSlideMicroscopyImageFrameTypeSequence = wsmiftSequence
-    sfgSequence = pydicom.sequence.Sequence([sharedFuncGroup])
+    #     # Output path
+    #     base_name, extension = os.path.splitext(filename)
+    #     output_filename = f"{base_name}{suffix}_{res['name']}.dicom"
+    #     output_path = os.path.join(output_dir, output_filename)
 
-    ds.SharedFunctionalGroupsSequence = sfgSequence
+    #     total_width = png_image.width * res['width_factor']
+    #     total_height = png_image.height * res['height_factor']
+        
+    #     numberOfFrames = res['numberOfFrames']
+    #     ds.NumberOfFrames = numberOfFrames
 
-    ###################################################################
-    ###################################################################
+    #     resized_img = np.resize(np_image, (total_height, total_width, 3))
+    #     pixel_data = resized_img.tobytes()
 
-    ds.save_as(output_path, write_like_original=False)
+    #     frame_width = png_image.width
+    #     frame_height = png_image.height
+    #     frame_pixel_size = len(pixel_data) // numberOfFrames
+    #     pixelSpacing = res['pixelSpacing']
 
-    print(f"Modified version of {filename} stored as {output_path}")
+    #     ds.TotalPixelMatrixColumns = total_width
+    #     ds.TotalPixelMatrixRows = total_height
+
+    #     pixel_data_sequence = pydicom.Sequence()
+
+        # frame width is 5x5 image minus borders (6)
+        # frame width: (width - 6) / 5
+
+        # for frame_number in range(numberOfFrames):
+        #     start_index = frame_number * frame_pixel_size
+        #     end_index = start_index + frame_pixel_size
+        #     frame_pixel_data = pixel_data[start_index:end_index]
+
+        #     frame_ds = pydicom.Dataset()
+        #     frame_ds.PixelData = frame_pixel_data
+        #     frame_ds.InstanceNumber = frame_number + 1
+
+        #     frame_ds.Rows = frame_height
+        #     frame_ds.Columns = frame_width
+
+        #     pixel_data_sequence.append(frame_ds)
+
+        # ds.PixelData = pixel_data_sequence
+
+        # ds.PixelData = np.tile(pixel_data, int(numberOfFrames))
+        ds.PixelData = np_image.tobytes()
+
+
+        pixelMatrixOrigin = pydicom.dataset.Dataset()
+        pixelMatrixOrigin.XOffsetInSlideCoordinateSystem = '0.0'
+        pixelMatrixOrigin.YOffsetInSlideCoordinateSystem = '0.0'
+        ds.TotalPixelMatrixOriginSequence = pydicom.sequence.Sequence([pixelMatrixOrigin])
+
+        pixelMeasures = pydicom.dataset.Dataset()
+        pixelMeasures.SliceThickness = '0.0'
+        pixelMeasures.PixelSpacing = pixelSpacing
+        pmSequence = pydicom.sequence.Sequence([pixelMeasures])
+
+        wsmImageFrameType = pydicom.dataset.Dataset()
+        wsmImageFrameType.FrameType = ['DERIVED', 'PRIMARY', 'VOLUME', 'NONE']
+        wsmiftSequence = pydicom.sequence.Sequence([wsmImageFrameType])
+
+        sharedFuncGroup = pydicom.dataset.Dataset()
+        sharedFuncGroup.PixelMeasuresSequence = pmSequence
+        sharedFuncGroup.WholeSlideMicroscopyImageFrameTypeSequence = wsmiftSequence
+        sfgSequence = pydicom.sequence.Sequence([sharedFuncGroup])
+
+        ds.SharedFunctionalGroupsSequence = sfgSequence
+
+        # Save Dicom Image
+        ds.save_as(output_path, write_like_original=False)
+
+        print(f"Modified version of {filename} stored as {output_path}")
