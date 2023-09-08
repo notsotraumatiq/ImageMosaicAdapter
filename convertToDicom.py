@@ -145,69 +145,69 @@ for filename in os.listdir(input_dir):
     # ds.PixelData = np_image.tobytes()
 
     # For each image, create 3 separate resolutions:
-    # resolutions = [
-    #     {
-    #         'name': 'highRes',
-    #         'numberOfFrames': 182,
-    #         'width_factor': 12,
-    #         'height_factor': 12,
-    #         'pixelSpacing': [0.0009706, 0.0009701]
-    #     },
-    #     {
-    #         'name': 'medRes',
-    #         'numberOfFrames': 49,
-    #         'width_factor': 6,
-    #         'height_factor': 6,
-    #         'pixelSpacing': [0.0019412, 0.0019403]
-    #     },
-    #     {
-    #         'name': 'lowRes',
-    #         'numberOfFrames': 9,
-    #         'width_factor': 3,
-    #         'height_factor': 3,
-    #         'pixelSpacing': [0.0038824, 0.0038806]
-    #     }
-    # ]
-    # for res in resolutions:
+    resolutions = [
+        {
+            'name': 'highRes',
+            'numberOfFrames': 182,
+            'width_factor': 12,
+            'height_factor': 12,
+            'pixelSpacing': [0.0009706, 0.0009701]
+        },
+        {
+            'name': 'medRes',
+            'numberOfFrames': 49,
+            'width_factor': 6,
+            'height_factor': 6,
+            'pixelSpacing': [0.0019412, 0.0019403]
+        },
+        {
+            'name': 'lowRes',
+            'numberOfFrames': 9,
+            'width_factor': 3,
+            'height_factor': 3,
+            'pixelSpacing': [0.0038824, 0.0038806]
+        }
+    ]
+    for res in resolutions:
 
-    #     # Output path
-    #     base_name, extension = os.path.splitext(filename)
-    #     output_filename = f"{base_name}{suffix}_{res['name']}.dicom"
-    #     output_path = os.path.join(output_dir, output_filename)
+        # Output path
+        base_name, extension = os.path.splitext(filename)
+        output_filename = f"{base_name}{suffix}_{res['name']}.dicom"
+        output_path = os.path.join(output_dir, output_filename)
 
-    #     total_width = png_image.width * res['width_factor']
-    #     total_height = png_image.height * res['height_factor']
+        total_width = png_image.width * res['width_factor']
+        total_height = png_image.height * res['height_factor']
         
-    #     numberOfFrames = res['numberOfFrames']
-    #     ds.NumberOfFrames = numberOfFrames
+        numberOfFrames = res['numberOfFrames']
+        ds.NumberOfFrames = numberOfFrames
 
-    #     resized_img = np.resize(np_image, (total_height, total_width, 3))
-    #     pixel_data = resized_img.tobytes()
+        resized_img = np.resize(np_image, (total_height, total_width, 3))
+        pixel_data = resized_img.tobytes()
 
-    #     frame_width = png_image.width
-    #     frame_height = png_image.height
-    #     frame_pixel_size = len(pixel_data) // numberOfFrames
-    #     pixelSpacing = res['pixelSpacing']
+        frame_width = png_image.width
+        frame_height = png_image.height
+        frame_pixel_size = len(pixel_data) // numberOfFrames
+        pixelSpacing = res['pixelSpacing']
 
-    #     ds.TotalPixelMatrixColumns = total_width
-    #     ds.TotalPixelMatrixRows = total_height
+        ds.TotalPixelMatrixColumns = total_width
+        ds.TotalPixelMatrixRows = total_height
 
-    #     pixel_data_sequence = pydicom.Sequence()
+        pixel_data_sequence = pydicom.Sequence()
 
         # frame width is 5x5 image minus borders (6)
         # frame width: (width - 6) / 5
 
-        # for frame_number in range(numberOfFrames):
-        #     start_index = frame_number * frame_pixel_size
-        #     end_index = start_index + frame_pixel_size
-        #     frame_pixel_data = pixel_data[start_index:end_index]
+        for frame_number in range(numberOfFrames):
+            start_index = frame_number * frame_pixel_size
+            end_index = start_index + frame_pixel_size
+            frame_pixel_data = pixel_data[start_index:end_index]
 
-        #     frame_ds = pydicom.Dataset()
-        #     frame_ds.PixelData = frame_pixel_data
-        #     frame_ds.InstanceNumber = frame_number + 1
+            frame_ds = pydicom.Dataset()
+            frame_ds.PixelData = frame_pixel_data
+            frame_ds.InstanceNumber = frame_number + 1
 
-        #     frame_ds.Rows = frame_height
-        #     frame_ds.Columns = frame_width
+            frame_ds.Rows = frame_height
+            frame_ds.Columns = frame_width
 
         #     pixel_data_sequence.append(frame_ds)
 
