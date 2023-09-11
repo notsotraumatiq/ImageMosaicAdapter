@@ -77,6 +77,8 @@ app.use(express.json());
   }
 
 
+
+// TODO: for non-zero padding, gridlines are not drawn correctly.  Need to fix this.
 async function createMosaic(gridData, cellType, padding=0) {
   const mosaicRows = gridData[0].length;
   const mosaicCols = gridData[0][0].length;
@@ -94,6 +96,9 @@ async function createMosaic(gridData, cellType, padding=0) {
   let maxCellHeight = 0;
   for (let row = 0; row < mosaicRows; row++) {
     for (let col = 0; col < mosaicCols; col++) {
+	  if (typeof(gridData[grid][row][col]) === 'undefined') {
+		continue;
+	  }
       const imageFile = `${baseDir}/${gridData[grid][row][col]}`;
       if (!fs.existsSync(imageFile)) { 
         continue; 
@@ -139,7 +144,7 @@ async function createMosaic(gridData, cellType, padding=0) {
       const xOffset = col * (maxCellWidth + gridLineWidth) + gridLineWidth;
       const yOffset = row * (maxCellHeight + gridLineWidth) + gridLineWidth;
 
-      if (!fs.existsSync(imageFile)) { 
+      if (typeof(gridData[grid][row][col]) === 'undefined' || !fs.existsSync(imageFile)) { 
         const blankImageWithBackground = await createBlankImage(maxCellWidth, maxCellHeight, { r: 0, g: 0, b: 0 }); // Black image; 
         compositeOperations.push({ input: blankImageWithBackground, top: yOffset, left: xOffset });
         console.log(`Row: ${row}, Col: ${col}, xOffset: ${xOffset}, yOffset: ${yOffset}, width: ${maxCellWidth}, height: ${maxCellHeight}, imageFile: BLANK`);
