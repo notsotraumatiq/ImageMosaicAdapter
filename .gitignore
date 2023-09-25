@@ -140,4 +140,5 @@ __pycache__/
 # *.DS_Store
 
 # Exclude built slim-demo-dicoms
-/images/slim-demo-dicom*
+# /images/slim-demo-dicom*
+images/slim-demo-dicoms/.DS_Store
